@@ -14,6 +14,18 @@ Class {
 	#package : 'MicroUML'
 }
 
+{ #category : 'composing' }
+UMLClass >> -- aString [
+
+	self addVariable: (UMLVariable named: aString)
+]
+
+{ #category : 'composing' }
+UMLClass >> @ aClass [
+
+	variables last type: aClass uClass
+]
+
 { #category : 'adding' }
 UMLClass >> addMenthod: aMethod [
 
