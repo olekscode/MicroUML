@@ -1,17 +1,19 @@
 Class {
-	#name : 'BAselineOfMicroUML',
+	#name : 'BaselineOfMicroUML',
 	#superclass : 'BaselineOf',
 	#category : 'BaselineOfMicroUML',
 	#package : 'BaselineOfMicroUML'
 }
 
 { #category : 'baselines' }
-BAselineOfMicroUML >> baseline: spec [
+BaselineOfMicroUML >> baseline: spec [
 
 	<baseline>
-	spec for: #common do: [
-		"Packages"
-		spec
-			package: 'MicroUML';
-			package: 'MicroUML-Tests' with: [ spec requires: #( 'MicroUML' ) ] ]
+	spec for: #common do: [ 
+			"Packages"
+			spec
+				package: 'MicroUML-AST';
+				package: 'MicroUML-Builder';
+				package: 'MicroUML-Tests'
+				with: [ spec requires: #( 'MicroUML-AST' 'MicroUML-Builder' ) ] ]
 ]
