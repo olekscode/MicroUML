@@ -108,6 +108,14 @@ MicroUMLClassNode >> attributes [
 	^ attributes
 ]
 
+{ #category : 'initialization' }
+MicroUMLClassNode >> initialize [
+
+	attributes := OrderedDictionary new.
+	methods := OrderedDictionary new.
+	links := OrderedCollection new
+]
+
 { #category : 'accessing' }
 MicroUMLClassNode >> links [
 
