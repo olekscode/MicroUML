@@ -11,7 +11,7 @@ Class {
 { #category : 'running' }
 MicroUMLBuilderTest >> setUp [
 
-	builder := MicroUMLBuilder new
+	builder := MicroUMLAstBuilder new
 ]
 
 { #category : 'tests' }

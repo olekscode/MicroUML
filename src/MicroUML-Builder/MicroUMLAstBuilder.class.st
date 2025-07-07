@@ -21,7 +21,7 @@ MyClass
 if you actually have a class named `MyClass` in your system.
 "
 Class {
-	#name : 'MicroUMLBuilder',
+	#name : 'MicroUMLAstBuilder',
 	#superclass : 'Object',
 	#instVars : [
 		'currentLink',
@@ -32,105 +32,128 @@ Class {
 	#package : 'MicroUML-Builder'
 }
 
+{ #category : 'examples' }
+MicroUMLAstBuilder class >> exampleSerie [
+
+	^ 
+#ComixSerie
+	--|> #AbstractSerie 
+	++ #isPrime @ Boolean
+	-- #size @ Integer 
+	>+ #factorial ~ #( int int ) => #int
+===
+#AbstractSerie 
+	++ #name @ String 
+	-- #size @ Integer 
+	>- #factorial~ #( uint uint ) => #uint.
+
+]
+
 { #category : 'UML - attributes' }
-MicroUMLBuilder >> ++ aSymbol [
+MicroUMLAstBuilder >> ++ aSymbol [
 
 	self startPublicAttribute: (self getSymbol: aSymbol)
 ]
 
 { #category : 'UML - attributes' }
-MicroUMLBuilder >> -- aSymbol [
+MicroUMLAstBuilder >> -- aSymbol [
 
 	self startPrivateAttribute: (self getSymbol: aSymbol)
 ]
 
 { #category : 'UML - relations' }
-MicroUMLBuilder >> --|> aSymbolOrClass [
+MicroUMLAstBuilder >> --|> aSymbolOrClass [
 
 	currentClass superclass: (self getSymbol: aSymbolOrClass)
 ]
 
 { #category : 'UML - relations' }
-MicroUMLBuilder >> <|-- aSymbolOrClass [
+MicroUMLAstBuilder >> <|-- aSymbolOrClass [
 
 	self ensureClassAt: (self getSymbol: aSymbolOrClass)
 ]
 
 { #category : 'UML - class separators' }
-MicroUMLBuilder >> === aSymbolOrClass [
+MicroUMLAstBuilder >> === aSymbolOrClass [
 
 	self finishCurrentClassAndStartNewClass:
 		(self getSymbol: aSymbolOrClass)
 ]
 
 { #category : 'UML - methods' }
-MicroUMLBuilder >> => aClassOrSymbol [
+MicroUMLAstBuilder >> => aClassOrSymbol [
 
 	self addMethodReturnType: (self getSymbol: aClassOrSymbol)
 ]
 
 { #category : 'UML - methods' }
-MicroUMLBuilder >> >+ aSymbol [
+MicroUMLAstBuilder >> >+ aSymbol [
 
 	self startPublicMethod: (self getSymbol: aSymbol)
 ]
 
 { #category : 'UML - methods' }
-MicroUMLBuilder >> >- aSymbol [
+MicroUMLAstBuilder >> >- aSymbol [
 
 	self startPrivateMethod: (self getSymbol: aSymbol)
 ]
 
 { #category : 'UML - attributes' }
-MicroUMLBuilder >> @ aClassOrSymbol [
+MicroUMLAstBuilder >> @ aClassOrSymbol [
 
 	self addAttributeType: (self getSymbol: aClassOrSymbol)
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> addAttributeType: aSymbol [
+MicroUMLAstBuilder >> addAttributeType: aSymbol [
 
 	currentClass addAttributeType: aSymbol
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> addMethodArgumentTypes: anArrayOfSymbol [
+MicroUMLAstBuilder >> addMethodArgumentTypes: anArrayOfSymbol [
 
 	currentClass addMethodArgumentTypes: anArrayOfSymbol
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> addMethodReturnType: aSymbol [
+MicroUMLAstBuilder >> addMethodReturnType: aSymbol [
 
 	currentClass addMethodReturnType: aSymbol
 ]
 
 { #category : 'accessing' }
-MicroUMLBuilder >> classAt: aSymbol [
+MicroUMLAstBuilder >> classAt: aSymbol [
 
 	^ classes at: aSymbol ifAbsent: [ ]
 ]
 
 { #category : 'class access' }
-MicroUMLBuilder >> classNodeClass [
+MicroUMLAstBuilder >> classNodeClass [
 
 	^ MicroUMLClassNode
 ]
 
 { #category : 'accessing' }
-MicroUMLBuilder >> currentClass [
+MicroUMLAstBuilder >> classesDo: aBlock [
+
+	classes valuesDo: aBlock
+]
+
+{ #category : 'accessing' }
+MicroUMLAstBuilder >> currentClass [
 
 	^ currentClass
 ]
 
 { #category : 'accessing' }
-MicroUMLBuilder >> ensureClassAt: aSymbol [
+MicroUMLAstBuilder >> ensureClassAt: aSymbol [
 
 	^ classes at: aSymbol ifAbsentPut: [ self newClassNode ]
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> finishCurrentClassAndStartNewClass: aSymbol [
+MicroUMLAstBuilder >> finishCurrentClassAndStartNewClass: aSymbol [
 
 	currentClass := classes
 		                   at: aSymbol
@@ -138,7 +161,7 @@ MicroUMLBuilder >> finishCurrentClassAndStartNewClass: aSymbol [
 ]
 
 { #category : 'private' }
-MicroUMLBuilder >> getSymbol: aClassOrString [
+MicroUMLAstBuilder >> getSymbol: aClassOrString [
 
 	aClassOrString isString ifTrue: [ ^ aClassOrString asSymbol ].
 	aClassOrString isClass ifTrue: [ ^ aClassOrString name asSymbol ].
@@ -146,44 +169,44 @@ MicroUMLBuilder >> getSymbol: aClassOrString [
 ]
 
 { #category : 'initialization' }
-MicroUMLBuilder >> initialize [
+MicroUMLAstBuilder >> initialize [
 
 	super initialize.
 	classes := Dictionary new
 ]
 
 { #category : 'instance creation' }
-MicroUMLBuilder >> newClassNode [
+MicroUMLAstBuilder >> newClassNode [
 
 	^ self classNodeClass new
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> startPrivateAttribute: aSymbol [
+MicroUMLAstBuilder >> startPrivateAttribute: aSymbol [
 
 	self currentClass addPrivateAttribute: aSymbol asSymbol
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> startPrivateMethod: aSymbol [
+MicroUMLAstBuilder >> startPrivateMethod: aSymbol [
 
 	self currentClass addPrivateMethod: aSymbol asSymbol
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> startPublicAttribute: aSymbol [
+MicroUMLAstBuilder >> startPublicAttribute: aSymbol [
 
 	self currentClass addPublicAttribute: aSymbol asSymbol
 ]
 
 { #category : 'building' }
-MicroUMLBuilder >> startPublicMethod: aSymbol [
+MicroUMLAstBuilder >> startPublicMethod: aSymbol [
 
 	self currentClass addPublicMethod: aSymbol asSymbol
 ]
 
 { #category : 'UML - methods' }
-MicroUMLBuilder >> ~ anArrayOfSymbol [
+MicroUMLAstBuilder >> ~ anArrayOfSymbol [
 
 	self addMethodArgumentTypes:
 		(anArrayOfSymbol collect: [ :symbol | self getSymbol: symbol ])

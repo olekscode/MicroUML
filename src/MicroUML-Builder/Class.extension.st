@@ -3,41 +3,41 @@ Extension { #name : 'Class' }
 { #category : '*MicroUML-Builder' }
 Class >> ++ aSymbol [
 
-	^ MicroUMLBuilder new === self ++ aSymbol
+	^ MicroUMLAstBuilder new === self ++ aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
 Class >> -- aSymbol [
 
-	^ MicroUMLBuilder new === self -- aSymbol
+	^ MicroUMLAstBuilder new === self -- aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
 Class >> --|> aSymbolOrClass [
 
-	^ MicroUMLBuilder new === self --|> aSymbolOrClass
+	^ MicroUMLAstBuilder new === self --|> aSymbolOrClass
 ]
 
 { #category : '*MicroUML-Builder' }
 Class >> <|-- aSymbolOrClass [
 
-	^ MicroUMLBuilder new === self <|-- aSymbolOrClass
+	^ MicroUMLAstBuilder new === self <|-- aSymbolOrClass
 ]
 
 { #category : '*MicroUML-Builder' }
 Class >> === aSymbolOrClass [
 
-	^ MicroUMLBuilder new === self === aSymbolOrClass
+	^ MicroUMLAstBuilder new === self === aSymbolOrClass
 ]
 
 { #category : '*MicroUML-Builder' }
 Class >> >+ aSymbol [
 
-	^ MicroUMLBuilder new === self >+ aSymbol
+	^ MicroUMLAstBuilder new === self >+ aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
 Class >> >- aSymbol [
 
-	^ MicroUMLBuilder new === self >- aSymbol
+	^ MicroUMLAstBuilder new === self >- aSymbol
 ]

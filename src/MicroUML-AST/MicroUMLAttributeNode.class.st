@@ -15,6 +15,21 @@ Class {
 	#package : 'MicroUML-AST'
 }
 
+{ #category : 'converting' }
+MicroUMLAttributeNode >> asRSShape [
+
+	^ RSLabel
+		  text: (String streamContents: [ :stream |
+					   self isPublic ifTrue: [ stream nextPut: $+ ].
+					   self isPrivate ifTrue: [ stream nextPut: $- ].
+					   stream nextPutAll: name.
+					   type ifNotNil: [
+							   stream
+								   nextPut: $:;
+								   nextPutAll: type ] ])
+		  model: self
+]
+
 { #category : 'accessing' }
 MicroUMLAttributeNode >> bePrivate [
 

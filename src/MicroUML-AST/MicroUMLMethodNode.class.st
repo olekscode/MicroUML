@@ -28,6 +28,25 @@ MicroUMLMethodNode >> argumentTypes: anArrayOfSymbol [
 	argumentTypes := anArrayOfSymbol
 ]
 
+{ #category : 'converting' }
+MicroUMLMethodNode >> asRSShape [
+
+	^ RSLabel
+		  text: (String streamContents: [ :stream |
+					   self isPublic ifTrue: [ stream nextPut: $+ ].
+					   self isPrivate ifTrue: [ stream nextPut: $- ].
+					   stream nextPutAll: name.
+					   stream
+						   nextPut: $(;
+						   nextPutAll: (', ' join: (argumentTypes ifNil: [ {  } ]));
+						   nextPut: $).
+					   returnType ifNotNil: [
+							   stream
+								   nextPut: $:;
+								   nextPutAll: returnType ] ])
+		  model: self
+]
+
 { #category : 'accessing' }
 MicroUMLMethodNode >> bePrivate [
 
