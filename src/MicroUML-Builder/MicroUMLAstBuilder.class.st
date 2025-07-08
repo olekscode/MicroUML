@@ -38,39 +38,43 @@ MicroUMLAstBuilder class >> exampleSerie [
 	^ 
 #ComixSerie
 	--|> #AbstractSerie 
-	++ #isPrime @ Boolean
-	-- #size @ Integer 
-	>+ #factorial ~ #( int int ) => #int
+	+ #isPrime @ Boolean
+	- #size @ Integer 
+	+ #factorial ~ #( int int ) @ #int
 ===
 #AbstractSerie 
-	++ #name @ String 
-	-- #size @ Integer 
-	>- #factorial~ #( uint uint ) => #uint.
+	+ #name @ String 
+	- #size @ Integer 
+	- #factorial~ #( uint uint ) @ #uint
+	+ #foo @ String
+	+ #bar ~ {} @ String 
+	+ #baz ~ {String} @ String 
+	+ #quuux @ Symbol.
 
 ]
 
-{ #category : 'UML - attributes' }
-MicroUMLAstBuilder >> ++ aSymbol [
+{ #category : 'UML - attributes and methods' }
+MicroUMLAstBuilder >> + aSymbol [
 
-	self startPublicAttribute: (self getSymbol: aSymbol)
+	self startPublicMember: (self getSymbol: aSymbol)
 ]
 
-{ #category : 'UML - attributes' }
-MicroUMLAstBuilder >> -- aSymbol [
+{ #category : 'UML - attributes and methods' }
+MicroUMLAstBuilder >> - aSymbol [
 
-	self startPrivateAttribute: (self getSymbol: aSymbol)
+	self startPrivateMember: (self getSymbol: aSymbol)
 ]
 
 { #category : 'UML - relations' }
 MicroUMLAstBuilder >> --|> aSymbolOrClass [
 
-	currentClass superclass: (self getSymbol: aSymbolOrClass)
+	self addSuperclass: (self getSymbol: aSymbolOrClass)
 ]
 
 { #category : 'UML - relations' }
 MicroUMLAstBuilder >> <|-- aSymbolOrClass [
 
-	self ensureClassAt: (self getSymbol: aSymbolOrClass)
+	self addSubclass: (self getSymbol: aSymbolOrClass)
 ]
 
 { #category : 'UML - class separators' }
@@ -80,46 +84,34 @@ MicroUMLAstBuilder >> === aSymbolOrClass [
 		(self getSymbol: aSymbolOrClass)
 ]
 
-{ #category : 'UML - methods' }
-MicroUMLAstBuilder >> => aClassOrSymbol [
-
-	self addMethodReturnType: (self getSymbol: aClassOrSymbol)
-]
-
-{ #category : 'UML - methods' }
-MicroUMLAstBuilder >> >+ aSymbol [
-
-	self startPublicMethod: (self getSymbol: aSymbol)
-]
-
-{ #category : 'UML - methods' }
-MicroUMLAstBuilder >> >- aSymbol [
-
-	self startPrivateMethod: (self getSymbol: aSymbol)
-]
-
-{ #category : 'UML - attributes' }
+{ #category : 'UML - attributes and methods' }
 MicroUMLAstBuilder >> @ aClassOrSymbol [
 
-	self addAttributeType: (self getSymbol: aClassOrSymbol)
+	self addMemberType: (self getSymbol: aClassOrSymbol)
 ]
 
 { #category : 'building' }
-MicroUMLAstBuilder >> addAttributeType: aSymbol [
+MicroUMLAstBuilder >> addMemberType: aSymbol [
 
-	currentClass addAttributeType: aSymbol
+	currentClass currentMember type: aSymbol
 ]
 
 { #category : 'building' }
 MicroUMLAstBuilder >> addMethodArgumentTypes: anArrayOfSymbol [
 
-	currentClass addMethodArgumentTypes: anArrayOfSymbol
+	currentClass currentMember argumentTypes: anArrayOfSymbol
 ]
 
 { #category : 'building' }
-MicroUMLAstBuilder >> addMethodReturnType: aSymbol [
+MicroUMLAstBuilder >> addSubclass: aSymbol [
 
-	currentClass addMethodReturnType: aSymbol
+	(self ensureClassAt: aSymbol) superclass: currentClass name
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addSuperclass: aSymbol [
+
+	currentClass superclass: aSymbol
 ]
 
 { #category : 'accessing' }
@@ -181,31 +173,25 @@ MicroUMLAstBuilder >> newClassNode [
 	^ self classNodeClass new
 ]
 
-{ #category : 'building' }
-MicroUMLAstBuilder >> startPrivateAttribute: aSymbol [
+{ #category : 'instance creation' }
+MicroUMLAstBuilder >> newRoassalBuilder [
 
-	self currentClass addPrivateAttribute: aSymbol asSymbol
+	^ MicroUMLRoassalBuilder new
 ]
 
 { #category : 'building' }
-MicroUMLAstBuilder >> startPrivateMethod: aSymbol [
+MicroUMLAstBuilder >> startPrivateMember: aSymbol [
 
-	self currentClass addPrivateMethod: aSymbol asSymbol
+	(self currentClass addMember: aSymbol asSymbol) bePrivate
 ]
 
 { #category : 'building' }
-MicroUMLAstBuilder >> startPublicAttribute: aSymbol [
+MicroUMLAstBuilder >> startPublicMember: aSymbol [
 
-	self currentClass addPublicAttribute: aSymbol asSymbol
+	(self currentClass addMember: aSymbol asSymbol) bePublic
 ]
 
-{ #category : 'building' }
-MicroUMLAstBuilder >> startPublicMethod: aSymbol [
-
-	self currentClass addPublicMethod: aSymbol asSymbol
-]
-
-{ #category : 'UML - methods' }
+{ #category : 'UML - attributes and methods' }
 MicroUMLAstBuilder >> ~ anArrayOfSymbol [
 
 	self addMethodArgumentTypes:
