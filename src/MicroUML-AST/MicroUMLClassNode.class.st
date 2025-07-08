@@ -12,8 +12,7 @@ Class {
 		'superclass',
 		'members',
 		'attributes',
-		'methods',
-		'links'
+		'methods'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -65,12 +64,6 @@ MicroUMLClassNode class >> exampleRoassal [
 	canvas
 		zoomToFit;
 		open
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addLink: aMicroUMLLink [
-
-	links add: aMicroUMLLink
 ]
 
 { #category : 'adding' }
@@ -158,14 +151,7 @@ MicroUMLClassNode >> currentMember [
 { #category : 'initialization' }
 MicroUMLClassNode >> initialize [
 
-	members := OrderedDictionary new.
-	links := OrderedCollection new
-]
-
-{ #category : 'accessing' }
-MicroUMLClassNode >> links [
-
-	^ links
+	members := OrderedDictionary new
 ]
 
 { #category : 'accessing' }

@@ -1,5 +1,5 @@
 Class {
-	#name : 'MicroUMLBuilderTest',
+	#name : 'MicroUMLAstBuilderTest',
 	#superclass : 'TestCase',
 	#instVars : [
 		'builder'
@@ -9,53 +9,58 @@ Class {
 }
 
 { #category : 'running' }
-MicroUMLBuilderTest >> setUp [
+MicroUMLAstBuilderTest >> setUp [
 
 	builder := MicroUMLAstBuilder new
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testAddAttributeType [
+MicroUMLAstBuilderTest >> testAddMemberType [
 
-	builder === #Foo ++ #attribute addAttributeType: #string.
+	builder === #Foo + #attribute addMemberType: #string.
 	self
 		assert: (builder currentClass attributeAt: #attribute) type
 		equals: #string
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testAddMethodArgumentTypes [
+MicroUMLAstBuilderTest >> testAddMethodArgumentTypes [
 
-	builder === #Foo >+ #op addMethodArgumentTypes: { #string. #uint }.
+	builder === #Foo + #op addMethodArgumentTypes: { #string. #uint }.
 	self
 		assert: (builder currentClass methodAt: #op) argumentTypes
 		equals: #( string uint )
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testAddMethodReturnType [
+MicroUMLAstBuilderTest >> testAddSubclass [
 
-	builder === #Foo >+ #op addMethodReturnType: #char.
-	self
-		assert: (builder currentClass methodAt: #op) returnType
-		equals: #char
+	builder === #Foo + #attribute addSubclass: #Bar.
+	self assert: (builder classAt: #Bar) superclass equals: #Foo
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testExampleComics [
+MicroUMLAstBuilderTest >> testAddSuperclass [
+
+	builder === #Foo + #attribute addSuperclass: #Bar.
+	self assert: builder currentClass superclass equals: #Bar
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testExampleComics [
 
 	| abstractSerie comixSerie |
 builder :=
 #ComixSerie
 	--|> #AbstractSerie 
-	++ #isPrime @ Boolean
-	-- #size @ Integer 
-	>+ #factorial ~ #( int int ) => #int
+	+ #isPrime @ Boolean
+	- #size @ Integer 
+	+ #factorial ~ #( int int ) @ #int
 ===
 #AbstractSerie 
-	++ #name @ String 
-	-- #size @ Integer 
-	>- #factorial~ #( uint uint ) => #uint.
+	+ #name @ String 
+	- #size @ Integer 
+	- #factorial~ #( uint uint ) @ #uint.
 
 	abstractSerie := builder classAt: #AbstractSerie.
 	comixSerie := builder classAt: #ComixSerie.
@@ -70,12 +75,12 @@ builder :=
 		assert: (abstractSerie methodAt: #factorial) argumentTypes
 		equals: #( uint uint ).
 	self
-		assert: (comixSerie methodAt: #factorial) returnType
+		assert: (comixSerie methodAt: #factorial) type
 		equals: #int
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testFinishCurrentClassAndStartNewClass [
+MicroUMLAstBuilderTest >> testFinishCurrentClassAndStartNewClass [
 
 	self assert: builder currentClass equals: nil.
 	self assert: builder === #Foo identicalTo: builder.
@@ -85,29 +90,15 @@ MicroUMLBuilderTest >> testFinishCurrentClassAndStartNewClass [
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testStartPrivateAttribute [
+MicroUMLAstBuilderTest >> testStartPrivateMember [
 
-	builder === #Foo startPrivateAttribute: #attribute.
-	self assert: (builder currentClass attributeAt: #attribute) isPrivate
+	builder === #Foo startPrivateMember: #attribute.
+	self assert: (builder currentClass memberAt: #attribute) isPrivate
 ]
 
 { #category : 'tests' }
-MicroUMLBuilderTest >> testStartPrivateMethod [
+MicroUMLAstBuilderTest >> testStartPublicMember [
 
-	builder === #Foo startPrivateMethod: #op.
-	self assert: (builder currentClass methodAt: #op) isPrivate
-]
-
-{ #category : 'tests' }
-MicroUMLBuilderTest >> testStartPublicAttribute [
-
-	builder === #Foo startPublicAttribute: #attribute.
-	self assert: (builder currentClass attributeAt: #attribute) isPublic
-]
-
-{ #category : 'tests' }
-MicroUMLBuilderTest >> testStartPublicMethod [
-
-	builder === #Foo startPublicMethod: #op.
-	self assert: (builder currentClass methodAt: #op) isPublic
+	builder === #Foo startPublicMember: #attribute.
+	self assert: (builder currentClass memberAt: #attribute) isPublic
 ]
