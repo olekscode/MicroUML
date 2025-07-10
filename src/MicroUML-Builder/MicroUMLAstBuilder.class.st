@@ -24,9 +24,10 @@ Class {
 	#name : 'MicroUMLAstBuilder',
 	#superclass : 'Object',
 	#instVars : [
-		'currentLink',
 		'currentClass',
-		'classes'
+		'classes',
+		'currentAssociation',
+		'associations'
 	],
 	#category : 'MicroUML-Builder',
 	#package : 'MicroUML-Builder'
@@ -36,21 +37,31 @@ Class {
 MicroUMLAstBuilder class >> exampleSerie [
 
 	^ 
-#ComixSerie
-	--|> #AbstractSerie 
-	+ #isPrime @ Boolean
-	- #size @ Integer 
-	+ #factorial ~ #( int int ) @ #int
-===
-#AbstractSerie 
+#AbstractSeries 
 	+ #name @ String 
-	- #size @ Integer 
-	- #factorial~ #( uint uint ) @ #uint
-	+ #foo @ String
-	+ #bar ~ {} @ String 
-	+ #baz ~ {String} @ String 
-	+ #quuux @ Symbol.
-
+	- #numEpisodes @ Integer
+=== 
+#NovelSeries 
+	--|> #AbstractSeries
+	+ #author @ String 
+	+ #Publisher @ String 
+	+ #read~{}
+=== 
+#ComicSeries 
+	--|> #AbstractSeries 
+	+ #toonAuthor @ String
+	- #storyAuthor @ String 
+	+ #print~{} 
+=== 
+#AnimeSeries
+	--|> #AbstractSeries 
+	+ #director @ String 
+	- #animators @ String
+	- #voiceActors @ String 
+	+ #play~{} 
+	<>---<'based on'> #ComicSeries 
+=== 
+#ComicSeries	 ---<'original'> #NovelSeries 
 ]
 
 { #category : 'UML - attributes and methods' }
@@ -65,13 +76,109 @@ MicroUMLAstBuilder >> - aSymbol [
 	self startPrivateMember: (self getSymbol: aSymbol)
 ]
 
-{ #category : 'UML - relations' }
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> --- aClassOrSymbol [
+
+	self
+		startAssociation;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> ---< aString [
+
+	self
+		startAssociation;
+		addAssociationRightLabel: aString asString
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> ---<*> aClassOrSymbol [
+
+	self
+		startAssociation;
+		addAssociationRightHead: #composition;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> ---<> aClassOrSymbol [
+
+	self
+		startAssociation;
+		addAssociationRightHead: #aggregation;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - inheritance' }
 MicroUMLAstBuilder >> --|> aSymbolOrClass [
 
 	self addSuperclass: (self getSymbol: aSymbolOrClass)
 ]
 
-{ #category : 'UML - relations' }
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> < aString [
+
+	self
+		startAssociation;
+		addAssociationLeftLabel: aString asString
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> <*>--- aClassOrSymbol [
+
+	self
+		startAssociation;
+		addAssociationLeftHead: #composition;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> <*>---< aString [
+
+	self
+		startAssociation;
+		addAssociationLeftHead: #composition;
+		addAssociationRightLabel: aString asString
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> <*>< aString [
+
+	self
+		startAssociation;
+		addAssociationLeftHead: #composition;
+		addAssociationLeftLabel: aString asString
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> <>--- aClassOrSymbol [
+
+	self
+		startAssociation;
+		addAssociationLeftHead: #aggregation;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> <>---< aString [
+
+	self
+		startAssociation;
+		addAssociationLeftHead: #aggregation;
+		addAssociationRightLabel: aString asString
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> <>< aString [
+
+	self
+		startAssociation;
+		addAssociationLeftHead: #aggregation;
+		addAssociationLeftLabel: aString asString
+]
+
+{ #category : 'UML - inheritance' }
 MicroUMLAstBuilder >> <|-- aSymbolOrClass [
 
 	self addSubclass: (self getSymbol: aSymbolOrClass)
@@ -84,10 +191,88 @@ MicroUMLAstBuilder >> === aSymbolOrClass [
 		(self getSymbol: aSymbolOrClass)
 ]
 
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> > aClassOrSymbol [
+
+	self finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> >--- aClassOrSymbol [
+
+	self finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> >---< aString [
+
+	self addAssociationRightLabel: aString asString
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> >---<*> aClassOrSymbol [
+
+	self
+		addAssociationRightHead: #composition;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> >---<> aClassOrSymbol [
+
+	self
+		addAssociationRightHead: #aggregation;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> ><*> aClassOrSymbol [
+
+	self
+		addAssociationRightHead: #composition;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - associations' }
+MicroUMLAstBuilder >> ><> aClassOrSymbol [
+
+	self
+		addAssociationRightHead: #aggregation;
+		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
 { #category : 'UML - attributes and methods' }
 MicroUMLAstBuilder >> @ aClassOrSymbol [
 
 	self addMemberType: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addAssociationLeftHead: aSymbol [
+
+	currentAssociation ifNil: [ ^ self ].
+	currentAssociation leftHead: aSymbol
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addAssociationLeftLabel: aString [
+
+	currentAssociation ifNil: [ ^ self ].
+	currentAssociation leftLabel: aString
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addAssociationRightHead: aSymbol [
+
+	currentAssociation ifNil: [ ^ self ].
+	currentAssociation rightHead: aSymbol
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addAssociationRightLabel: aString [
+
+	currentAssociation ifNil: [ ^ self ].
+	currentAssociation rightLabel: aString
 ]
 
 { #category : 'building' }
@@ -114,6 +299,24 @@ MicroUMLAstBuilder >> addSuperclass: aSymbol [
 	currentClass superclass: aSymbol
 ]
 
+{ #category : 'class access' }
+MicroUMLAstBuilder >> associationNodeClass [
+
+	^ MicroUMLAssociationNode
+]
+
+{ #category : 'accessing' }
+MicroUMLAstBuilder >> associations [
+
+	^ associations asArray
+]
+
+{ #category : 'enumerating' }
+MicroUMLAstBuilder >> associationsDo: aBlock [
+
+	associations do: aBlock
+]
+
 { #category : 'accessing' }
 MicroUMLAstBuilder >> classAt: aSymbol [
 
@@ -126,10 +329,16 @@ MicroUMLAstBuilder >> classNodeClass [
 	^ MicroUMLClassNode
 ]
 
-{ #category : 'accessing' }
+{ #category : 'enumerating' }
 MicroUMLAstBuilder >> classesDo: aBlock [
 
 	classes valuesDo: aBlock
+]
+
+{ #category : 'accessing' }
+MicroUMLAstBuilder >> currentAssociation [
+
+	^ currentAssociation
 ]
 
 { #category : 'accessing' }
@@ -142,6 +351,15 @@ MicroUMLAstBuilder >> currentClass [
 MicroUMLAstBuilder >> ensureClassAt: aSymbol [
 
 	^ classes at: aSymbol ifAbsentPut: [ self newClassNode ]
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> finishAssociation: aSymbol [
+
+	currentAssociation ifNil: [ ^ self ].
+	currentAssociation rightClass: aSymbol.
+	associations add: currentAssociation.
+	currentAssociation := nil
 ]
 
 { #category : 'building' }
@@ -164,7 +382,14 @@ MicroUMLAstBuilder >> getSymbol: aClassOrString [
 MicroUMLAstBuilder >> initialize [
 
 	super initialize.
-	classes := Dictionary new
+	classes := OrderedDictionary new.
+	associations := OrderedCollection new
+]
+
+{ #category : 'instance creation' }
+MicroUMLAstBuilder >> newAssociationNode [
+
+	^ self associationNodeClass new
 ]
 
 { #category : 'instance creation' }
@@ -177,6 +402,24 @@ MicroUMLAstBuilder >> newClassNode [
 MicroUMLAstBuilder >> newRoassalBuilder [
 
 	^ MicroUMLRoassalBuilder new
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> startAndFinishAssociation: aSymbol [
+
+	currentAssociation := self newAssociationNode.
+	currentAssociation
+		leftClass: currentClass name;
+		rightClass: aSymbol.
+	associations add: currentAssociation.
+	currentAssociation := nil
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> startAssociation [
+
+	currentAssociation := self newAssociationNode leftClass:
+		                      currentClass name
 ]
 
 { #category : 'building' }

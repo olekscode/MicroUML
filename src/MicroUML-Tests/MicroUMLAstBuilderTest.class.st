@@ -47,6 +47,59 @@ MicroUMLAstBuilderTest >> testAddSuperclass [
 ]
 
 { #category : 'tests' }
+MicroUMLAstBuilderTest >> testAssociations [
+
+	builder === 
+	#Foo 
+		--- #Bar 
+		<>--- #Baz 
+		<*>--- #Quuux
+		---<> #Zeta
+		---<*> #TurnA.
+	self assert: builder associations size = 5.
+	self assert: (builder associations collect: #leftClass) equals: #(Foo Foo Foo Foo Foo).
+	self assert: (builder associations collect: #rightClass) equals: #(Bar Baz Quuux Zeta TurnA).
+	self assert: (builder associations collect: #leftHead) equals: #(nil aggregation composition nil nil).
+	self assert: (builder associations collect: #rightHead) equals: #(nil nil nil aggregation composition).
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testAssociationsWithLeftLabel [
+
+	builder === 
+	#Foo 
+		<'1'>--- #Bar 
+		<><'*'>--- #Baz 
+		<*><'1..n'>--- #Quuux
+		<'zeta'>---<> #Zeta
+		<'* turnA'>---<*> #TurnA.
+	self assert: builder associations size = 5.
+	self assert: (builder associations collect: #leftClass) equals: #(Foo Foo Foo Foo Foo).
+	self assert: (builder associations collect: #rightClass) equals: #(Bar Baz Quuux Zeta TurnA).
+	self assert: (builder associations collect: #leftHead) equals: #(nil aggregation composition nil nil).
+	self assert: (builder associations collect: #rightHead) equals: #(nil nil nil aggregation composition).
+	self assert: (builder associations collect: #leftLabel) equals: #('1' '*' '1..n' 'zeta' '* turnA')
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testAssociationsWithRightLabel [
+
+	builder === 
+	#Foo 
+		---<'1'> #Bar 
+		<>---<'*'> #Baz 
+		<*>---<'1..n'> #Quuux
+		---<'zeta'><> #Zeta
+		---<'* turnA'><*> #TurnA.
+	self assert: builder associations size = 5.
+	self assert: (builder associations collect: #leftClass) equals: #(Foo Foo Foo Foo Foo).
+	self assert: (builder associations collect: #rightClass) equals: #(Bar Baz Quuux Zeta TurnA).
+	self assert: (builder associations collect: #leftHead) equals: #(nil aggregation composition nil nil).
+	self assert: (builder associations collect: #rightHead) equals: #(nil nil nil aggregation composition).
+	self assert: (builder associations collect: #rightLabel) equals: #('1' '*' '1..n' 'zeta' '* turnA')
+]
+
+{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testExampleComics [
 
 	| abstractSerie comixSerie |
