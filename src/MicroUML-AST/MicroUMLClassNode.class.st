@@ -10,9 +10,9 @@ Class {
 	#instVars : [
 		'name',
 		'superclass',
+		'members',
 		'attributes',
-		'methods',
-		'links'
+		'methods'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -67,75 +67,9 @@ MicroUMLClassNode class >> exampleRoassal [
 ]
 
 { #category : 'adding' }
-MicroUMLClassNode >> addAttribute: aSymbol [
+MicroUMLClassNode >> addMember: aSymbol [
 
-	attributes
-		at: aSymbol
-		put: (self attributeNodeClass new name: aSymbol)
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addAttributeType: aSymbol [
-
-	attributes values last type: aSymbol
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addLink: aMicroUMLLink [
-
-	links add: aMicroUMLLink
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addMethod: aSymbol [
-
-	methods
-		at: aSymbol asSymbol
-		put: (self methodNodeClass new name: aSymbol)
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addMethodArgumentTypes: anArrayOfSymbol [
-
-	methods values last argumentTypes: anArrayOfSymbol
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addMethodReturnType: aSymbol [
-
-	methods values last returnType: aSymbol
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addPrivateAttribute: aSymbol [
-
-	attributes at: aSymbol put: (self attributeNodeClass new
-			 name: aSymbol;
-			 bePrivate)
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addPrivateMethod: aSymbol [
-
-	methods at: aSymbol asSymbol put: (self methodNodeClass new
-			 name: aSymbol;
-			 bePrivate)
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addPublicAttribute: aSymbol [
-
-	attributes at: aSymbol put: (self attributeNodeClass new
-			 name: aSymbol;
-			 bePublic)
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> addPublicMethod: aSymbol [
-
-	methods at: aSymbol asSymbol put: (self methodNodeClass new
-			 name: aSymbol;
-			 bePublic)
+	^ members at: aSymbol put: (self memberNodeClass new name: aSymbol)
 ]
 
 { #category : 'converting' }
@@ -143,10 +77,10 @@ MicroUMLClassNode >> asRSShape [
 
 	| myLabel attributeShapes methodShapes memberShapes rect y1 y2 box |
 	myLabel := RSLabel text: name model: self.
-	attributeShapes := attributes values collect: #asRSShape.
+	attributeShapes := self attributesCollect: #asRSShape.
 	RSVerticalLineLayout new alignLeft on: attributeShapes.
 	attributeShapes := attributeShapes asShape.
-	methodShapes := methods values collect: #asRSShape.
+	methodShapes := self methodsCollect: #asRSShape.
 	RSVerticalLineLayout new alignLeft on: methodShapes.
 	methodShapes := methodShapes asShape.
 	RSVerticalLineLayout new alignLeft on: {
@@ -183,51 +117,99 @@ MicroUMLClassNode >> asRSShape [
 { #category : 'accessing' }
 MicroUMLClassNode >> attributeAt: aSymbol [
 
-	^ attributes at: aSymbol ifAbsent: [ ]
-]
-
-{ #category : 'class access' }
-MicroUMLClassNode >> attributeNodeClass [
-
-	^ MicroUMLAttributeNode
+	^ (self memberAt: aSymbol) ifNotNil: [ :member |
+			  member isAttribute
+				  ifTrue: [ member ]
+				  ifFalse: [ nil ] ]
 ]
 
 { #category : 'accessing' }
 MicroUMLClassNode >> attributes [
 
-	^ attributes
+	^ self members select: #isAttribute
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> attributesCollect: aBlock [
+
+	^ members values select: #isAttribute thenCollect: aBlock
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> attributesDo: aBlock [
+
+	self membersDo: [ :member |
+		member isAttribute ifTrue: [ aBlock value: member ] ]
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> currentMember [
+
+	^ members values last
 ]
 
 { #category : 'initialization' }
 MicroUMLClassNode >> initialize [
 
-	attributes := OrderedDictionary new.
-	methods := OrderedDictionary new.
-	links := OrderedCollection new
+	members := OrderedDictionary new
 ]
 
 { #category : 'accessing' }
-MicroUMLClassNode >> links [
+MicroUMLClassNode >> memberAt: aSymbol [
 
-	^ links
+	^ members at: aSymbol ifAbsent: [ ]
+]
+
+{ #category : 'class access' }
+MicroUMLClassNode >> memberNodeClass [
+
+	^ MicroUMLMemberNode
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> members [
+
+	^ members values
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> membersCollect: aBlock [
+
+	^ members values collect: aBlock
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> membersDo: aBlock [
+
+	members valuesDo: aBlock
 ]
 
 { #category : 'accessing' }
 MicroUMLClassNode >> methodAt: aSymbol [
 
-	^ methods at: aSymbol ifAbsent: [ ]
-]
-
-{ #category : 'class access' }
-MicroUMLClassNode >> methodNodeClass [
-
-	^ MicroUMLMethodNode
+	^ (self memberAt: aSymbol) ifNotNil: [ :member |
+			  member isMethod
+				  ifTrue: [ member ]
+				  ifFalse: [ nil ] ]
 ]
 
 { #category : 'accessing' }
 MicroUMLClassNode >> methods [
 
-	^ methods
+	^ self members select: #isMethod
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> methodsCollect: aBlock [
+
+	^ members values select: #isMethod thenCollect: aBlock
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> methodsDo: aBlock [
+
+	self membersDo: [ :member |
+		member isMethod ifTrue: [ aBlock value: member ] ]
 ]
 
 { #category : 'accessing' }

@@ -4,105 +4,118 @@ I have name(symbol), argument types (array of symbol, or nil if omitted), and re
 My visibility is either #public or #private.
 "
 Class {
-	#name : 'MicroUMLMethodNode',
+	#name : 'MicroUMLMemberNode',
 	#superclass : 'Object',
 	#instVars : [
 		'name',
 		'argumentTypes',
-		'returnType',
-		'visibility'
+		'visibility',
+		'type'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
 }
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> argumentTypes [
+MicroUMLMemberNode >> argumentTypes [
 
 	^ argumentTypes
 ]
 
-{ #category : 'adding' }
-MicroUMLMethodNode >> argumentTypes: anArrayOfSymbol [
+{ #category : 'accessing' }
+MicroUMLMemberNode >> argumentTypes: anArrayOfSymbol [
 
 	argumentTypes := anArrayOfSymbol
 ]
 
 { #category : 'converting' }
-MicroUMLMethodNode >> asRSShape [
+MicroUMLMemberNode >> asRSShape [
 
 	^ RSLabel
 		  text: (String streamContents: [ :stream |
 					   self isPublic ifTrue: [ stream nextPut: $+ ].
 					   self isPrivate ifTrue: [ stream nextPut: $- ].
 					   stream nextPutAll: name.
-					   stream
-						   nextPut: $(;
-						   nextPutAll: (', ' join: (argumentTypes ifNil: [ {  } ]));
-						   nextPut: $).
-					   returnType ifNotNil: [
+					   argumentTypes ifNotNil: [
+							   stream
+								   nextPut: $(;
+								   nextPutAll: (', ' join: argumentTypes);
+								   nextPut: $) ].
+					   type ifNotNil: [
 							   stream
 								   nextPut: $:;
-								   nextPutAll: returnType ] ])
+								   nextPutAll: type ] ])
 		  model: self
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> bePrivate [
+MicroUMLMemberNode >> bePrivate [
 
 	visibility := #private
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> bePublic [
+MicroUMLMemberNode >> bePublic [
 
 	visibility := #public
 ]
 
 { #category : 'testing' }
-MicroUMLMethodNode >> isPrivate [
+MicroUMLMemberNode >> isAttribute [
+
+	^ self isMethod not
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isMethod [
+
+	^ argumentTypes notNil
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isPrivate [
 
 	^ visibility = #private
 ]
 
 { #category : 'testing' }
-MicroUMLMethodNode >> isPublic [
+MicroUMLMemberNode >> isPublic [
 
 	^ visibility = #public
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> name [
+MicroUMLMemberNode >> name [
 
 	^ name
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> name: anObject [
+MicroUMLMemberNode >> name: anObject [
 
 	name := anObject
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> returnType [
+MicroUMLMemberNode >> type [
 
-	^ returnType
+	^ type
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> returnType: anObject [
+MicroUMLMemberNode >> type: anObject [
 
-	returnType := anObject
+	type := anObject
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> visibility [
+MicroUMLMemberNode >> visibility [
 
 	^ visibility
 ]
 
 { #category : 'accessing' }
-MicroUMLMethodNode >> visibility: aSymbol [
+MicroUMLMemberNode >> visibility: aSymbol [
 
 	visibility := aSymbol
 ]

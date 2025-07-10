@@ -1,15 +1,15 @@
 Extension { #name : 'Class' }
 
 { #category : '*MicroUML-Builder' }
-Class >> ++ aSymbol [
+Class >> + aSymbol [
 
-	^ MicroUMLAstBuilder new === self ++ aSymbol
+	^ MicroUMLAstBuilder new === self + aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
-Class >> -- aSymbol [
+Class >> - aSymbol [
 
-	^ MicroUMLAstBuilder new === self -- aSymbol
+	^ MicroUMLAstBuilder new === self - aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
@@ -28,16 +28,4 @@ Class >> <|-- aSymbolOrClass [
 Class >> === aSymbolOrClass [
 
 	^ MicroUMLAstBuilder new === self === aSymbolOrClass
-]
-
-{ #category : '*MicroUML-Builder' }
-Class >> >+ aSymbol [
-
-	^ MicroUMLAstBuilder new === self >+ aSymbol
-]
-
-{ #category : '*MicroUML-Builder' }
-Class >> >- aSymbol [
-
-	^ MicroUMLAstBuilder new === self >- aSymbol
 ]
