@@ -10,7 +10,10 @@ Class {
 		'name',
 		'argumentTypes',
 		'visibility',
-		'type'
+		'type',
+		'isClassSide',
+		'isAbstract',
+		'modifiers'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -49,6 +52,30 @@ MicroUMLMemberNode >> asRSShape [
 ]
 
 { #category : 'accessing' }
+MicroUMLMemberNode >> beAbstract [
+
+	isAbstract := true
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> beClassSide [
+
+	isClassSide := true
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> beConcrete [
+
+	isAbstract := false
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> beInstanceSide [
+
+	isClassSide := false
+]
+
+{ #category : 'accessing' }
 MicroUMLMemberNode >> bePrivate [
 
 	visibility := #private
@@ -60,10 +87,42 @@ MicroUMLMemberNode >> bePublic [
 	visibility := #public
 ]
 
+{ #category : 'initialization' }
+MicroUMLMemberNode >> initialize [
+
+	super initialize.
+	isClassSide := false.
+	isAbstract := false
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isAbstract [
+
+	^ isAbstract = true
+]
+
 { #category : 'testing' }
 MicroUMLMemberNode >> isAttribute [
 
 	^ self isMethod not
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isClassSide [
+
+	^ isClassSide = true
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isConcrete [
+
+	^ self isAbstract not
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isInstanceSide [
+
+	^ self isClassSide not
 ]
 
 { #category : 'testing' }
@@ -82,6 +141,20 @@ MicroUMLMemberNode >> isPrivate [
 MicroUMLMemberNode >> isPublic [
 
 	^ visibility = #public
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> modifiers [
+
+	^ modifiers
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> modifiers: anArrayOfSymbol [
+
+	modifiers := anArrayOfSymbol.
+	(modifiers includes: #abstract) ifTrue: [ self beAbstract ].
+	(modifiers includes: #static) ifTrue: [ self beClassSide ]
 ]
 
 { #category : 'accessing' }
