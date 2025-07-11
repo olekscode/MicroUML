@@ -75,6 +75,23 @@ MicroUMLClassNodeTest >> testAttributesDo [
 ]
 
 { #category : 'tests' }
+MicroUMLClassNodeTest >> testBeAbstract [
+
+	self deny: class isAbstract.
+	class beAbstract.
+	self assert: class isAbstract
+]
+
+{ #category : 'tests' }
+MicroUMLClassNodeTest >> testBeConcrete [
+
+	class beAbstract.
+	self deny: class isConcrete.
+	class beConcrete.
+	self assert: class isConcrete
+]
+
+{ #category : 'tests' }
 MicroUMLClassNodeTest >> testCurrentMember [
 
 	| foo bar |
@@ -83,6 +100,16 @@ MicroUMLClassNodeTest >> testCurrentMember [
 	bar := class addMember: #bar.
 	self deny: bar identicalTo: foo.
 	self assert: class currentMember identicalTo: bar
+]
+
+{ #category : 'tests' }
+MicroUMLClassNodeTest >> testCurrentMemberName [
+
+	| foo |
+	foo := class addMember: nil.
+	self assert: class currentMember identicalTo: foo.
+	class currentMemberName: #foo.
+	self assert: (class memberAt: #foo) identicalTo: foo
 ]
 
 { #category : 'tests' }
@@ -183,6 +210,15 @@ MicroUMLClassNodeTest >> testMethodsDo [
 		assert: (Array streamContents: [ :stream |
 				 class methodsDo: [ :method | stream nextPut: method name ] ])
 		equals: #( bar baz )
+]
+
+{ #category : 'tests' }
+MicroUMLClassNodeTest >> testModifiers [
+
+	self deny: class isAbstract.
+	class modifiers: #( abstract ).
+	self assert: class isAbstract.
+	self assert: class modifiers equals: #( abstract )
 ]
 
 { #category : 'tests' }

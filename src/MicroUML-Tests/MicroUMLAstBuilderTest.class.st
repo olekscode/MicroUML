@@ -15,6 +15,13 @@ MicroUMLAstBuilderTest >> setUp [
 ]
 
 { #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddClassName [
+
+	builder === #( abstract ) % #Foo.
+	self assert: builder currentClass name equals: #Foo
+]
+
+{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testAddMemberType [
 
 	builder === #Foo + #attribute addMemberType: #string.
@@ -143,6 +150,15 @@ MicroUMLAstBuilderTest >> testFinishCurrentClassAndStartNewClass [
 ]
 
 { #category : 'tests' }
+MicroUMLAstBuilderTest >> testFinishCurrentClassAndStartNewClassModifiers [
+
+	self assert: builder currentClass equals: nil.
+	self assert: builder === #( abstract ) identicalTo: builder.
+	self assert: builder currentClass name isNil.
+	self assert: builder currentClass modifiers equals: #( abstract )
+]
+
+{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testStartPrivateMember [
 
 	builder === #Foo startPrivateMember: #attribute.
@@ -150,8 +166,28 @@ MicroUMLAstBuilderTest >> testStartPrivateMember [
 ]
 
 { #category : 'tests' }
+MicroUMLAstBuilderTest >> testStartPrivateMemberModifiers [
+
+	builder === #Foo startPrivateMemberModifiers: #( abstract static ).
+	self assert: builder currentClass currentMember isPrivate.
+	self assert: builder currentClass currentMember isAbstract.
+	self assert: builder currentClass currentMember isClassSide.
+	self assert: builder currentClass currentMember name isNil
+]
+
+{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testStartPublicMember [
 
 	builder === #Foo startPublicMember: #attribute.
 	self assert: (builder currentClass memberAt: #attribute) isPublic
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testStartPublicMemberModifiers [
+
+	builder === #Foo startPublicMemberModifiers: #( abstract static ).
+	self assert: builder currentClass currentMember isPublic.
+	self assert: builder currentClass currentMember isAbstract.
+	self assert: builder currentClass currentMember isClassSide.
+	self assert: builder currentClass currentMember name isNil
 ]

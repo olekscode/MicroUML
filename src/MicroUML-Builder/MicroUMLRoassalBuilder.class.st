@@ -18,20 +18,21 @@ MicroUMLRoassalBuilder class >> exampleSerie [
 
 	| uml builder |
 	uml := 
-#AbstractSeries 
+#(abstract) % #AbstractSeries 
 	+ #name @ String 
-	- #numEpisodes @ Integer
+	- #(abstract) % #numEpisodes @ Integer
+	+ #(static) % #findByName ~ {#String} @ #AbstractSeries
 === 
 #NovelSeries 
 	--|> #AbstractSeries
 	+ #author @ String 
-	+ #Publisher @ String 
+	* #Publisher @ String 
 	+ #read~{}
 === 
 #ComicSeries 
 	--|> #AbstractSeries 
 	+ #toonAuthor @ String
-	- #storyAuthor @ String 
+	* #storyAuthor @ String 
 	+ #print~{} 
 === 
 #AnimeSeries
@@ -141,6 +142,8 @@ MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 	myLabel := RSLabel
 		           text: aMicroUMLClassNode name
 		           model: aMicroUMLClassNode.
+	aMicroUMLClassNode isAbstract ifTrue: [
+		myLabel emphasis: TextEmphasis italic ].
 	attributeShapes := aMicroUMLClassNode attributesCollect: [ :attribute |
 		                   self newMemberLabelFor: attribute ].
 	RSVerticalLineLayout new alignLeft on: attributeShapes.
@@ -245,21 +248,30 @@ MicroUMLRoassalBuilder >> newMarkerFor: aSymbol [
 { #category : 'instance creation' }
 MicroUMLRoassalBuilder >> newMemberLabelFor: aMicroUMLMemberNode [
 
-	^ RSLabel
-		  text: (String streamContents: [ :stream |
-					   aMicroUMLMemberNode isPublic ifTrue: [ stream nextPut: $+ ].
-					   aMicroUMLMemberNode isPrivate ifTrue: [ stream nextPut: $- ].
-					   stream nextPutAll: aMicroUMLMemberNode name.
-					   aMicroUMLMemberNode argumentTypes ifNotNil: [ :argumentTypes |
-							   stream
-								   nextPut: $(;
-								   nextPutAll: (', ' join: argumentTypes);
-								   nextPut: $) ].
-					   aMicroUMLMemberNode type ifNotNil: [ :type |
-							   stream
-								   nextPut: $:;
-								   nextPutAll: type ] ])
-		  model: aMicroUMLMemberNode
+	| label |
+	label := RSLabel
+		         text: (String streamContents: [ :stream |
+					          aMicroUMLMemberNode isPublic ifTrue: [
+						          stream nextPut: $+ ].
+					          aMicroUMLMemberNode isPrivate ifTrue: [
+						          stream nextPut: $- ].
+					          stream nextPutAll: aMicroUMLMemberNode name.
+					          aMicroUMLMemberNode argumentTypes ifNotNil: [
+							          :argumentTypes |
+							          stream
+								          nextPut: $(;
+								          nextPutAll: (', ' join: argumentTypes);
+								          nextPut: $) ].
+					          aMicroUMLMemberNode type ifNotNil: [ :type |
+							          stream
+								          nextPut: $:;
+								          nextPutAll: type ] ])
+		         model: aMicroUMLMemberNode.
+	aMicroUMLMemberNode isAbstract ifTrue: [
+		label emphasis: TextEmphasis italic ].
+	aMicroUMLMemberNode isClassSide ifTrue: [
+		label emphasis: TextEmphasis underlined ].
+	^ label
 ]
 
 { #category : 'building' }

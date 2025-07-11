@@ -12,7 +12,9 @@ Class {
 		'superclass',
 		'members',
 		'attributes',
-		'methods'
+		'methods',
+		'isAbstract',
+		'modifiers'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -67,9 +69,11 @@ MicroUMLClassNode class >> exampleRoassal [
 ]
 
 { #category : 'adding' }
-MicroUMLClassNode >> addMember: aSymbol [
+MicroUMLClassNode >> addMember: aSymbolOrNil [
 
-	^ members at: aSymbol put: (self memberNodeClass new name: aSymbol)
+	^ members
+		  at: aSymbolOrNil
+		  put: (self memberNodeClass new name: aSymbolOrNil)
 ]
 
 { #category : 'converting' }
@@ -143,15 +147,50 @@ MicroUMLClassNode >> attributesDo: aBlock [
 ]
 
 { #category : 'accessing' }
+MicroUMLClassNode >> beAbstract [
+
+	isAbstract := true
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> beConcrete [
+
+	isAbstract := false
+]
+
+{ #category : 'accessing' }
 MicroUMLClassNode >> currentMember [
 
 	^ members values last
 ]
 
+{ #category : 'adding' }
+MicroUMLClassNode >> currentMemberName: aSymbol [
+
+	| member |
+	member := self currentMember.
+	members removeKey: member name.
+	member name: aSymbol.
+	members at: member name put: member
+]
+
 { #category : 'initialization' }
 MicroUMLClassNode >> initialize [
 
-	members := OrderedDictionary new
+	members := OrderedDictionary new.
+	isAbstract := false
+]
+
+{ #category : 'testing' }
+MicroUMLClassNode >> isAbstract [
+
+	^ isAbstract = true
+]
+
+{ #category : 'testing' }
+MicroUMLClassNode >> isConcrete [
+
+	^ self isAbstract not
 ]
 
 { #category : 'accessing' }
@@ -210,6 +249,19 @@ MicroUMLClassNode >> methodsDo: aBlock [
 
 	self membersDo: [ :member |
 		member isMethod ifTrue: [ aBlock value: member ] ]
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> modifiers [
+
+	^ modifiers
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> modifiers: anArrayOfSymbol [
+
+	modifiers := anArrayOfSymbol.
+	(modifiers includes: #abstract) ifTrue: [ self beAbstract ]
 ]
 
 { #category : 'accessing' }
