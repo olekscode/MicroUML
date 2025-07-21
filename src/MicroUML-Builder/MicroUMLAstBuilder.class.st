@@ -64,7 +64,7 @@ Example of novel and comic derrived from anime
 	+ #play~{} 
 	<>---<''based on''> #ComicSeries 
 === 
-#ComicSeries	 ---<''original''> #NovelSeries 
+#AnimeSeries	 ---<''original''> #NovelSeries 
 extent: 600 @ 400
 ```
 ')  open
@@ -98,7 +98,7 @@ MicroUMLAstBuilder class >> exampleSerie [
 	+ #play~{} 
 	<>---<'based on'> #ComicSeries 
 === 
-#ComicSeries	 ---<'original'> #NovelSeries 
+#AnimeSeries	 ---<'original'> #NovelSeries 
 extent: 800@600
 ]
 
