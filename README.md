@@ -1,8 +1,6 @@
-# MicroUML
+# MicroUML: A UML model and an embedded DSL in Pharo.
 
-A UML model and an embedded DSL in Pharo
-
-MicroUML is a project to support a small syntax to describe class diagram. 
+MicroUML offers a small Pharo embedded syntax to describe class diagrams. 
 
 ## Needs
 
@@ -14,6 +12,9 @@ MicroUML has been designed during ESUG 2025 at Gdansk with the following constra
 
 - only use the Pharo syntax
 - be compact
+- covers most of the UML class diagram
+- supports simple relation
+- produces a minimal metamodel objects
 
 ### Syntax
 
@@ -31,7 +32,7 @@ Class definition starts with `#` and conceptually produces a UmlClassBox
 
 #### Members
 
-The message -, +, * are used to add members to a UmlClassBox
+The message `-`, `+`, `*` are used to add members to a UmlClassBox
 
 ```
 #AbstractSeries
@@ -107,13 +108,14 @@ Here is the Pharo program that creates a metamodel that can be rendered as the p
 #ComicSeries 
     --|> #AbstractSeries 
     + #toonAuthor @ String
-    #storyAuthor @ String + #print~{}
+    * #storyAuthor @ String
+    + #print~{}
 === 
 #AnimeSeries
     --|> #AbstractSeries 
     + #director @ String 
-    #animators @ String
-    #voiceActors @ String
+    * #animators @ String
+    * #voiceActors @ String
     + #play~{} <>---<'based on'> #ComicSeries
 === 
 #ComicSeries ---<'original'> #NovelSeries 
