@@ -35,12 +35,6 @@ The message -, +, * are used to add members to a UmlClassBox
 
 ```
 #AbstractSeries
-    + #read~{}
-    + #printOn:~{s @Stream}
-```
-
-```
-#AbstractSeries
     - #read~{}
     + #printOn:~{s @Stream}
 ```
@@ -49,7 +43,7 @@ The message -, +, * are used to add members to a UmlClassBox
 
 ```
 #AbstractSeries
-    
+    $ ClassVar @ #Float
     + #(static) % #findByName ~ {#String} @ #AbstractSeries
 ```
 
@@ -81,13 +75,9 @@ We use `===` to link multiple class definitions.
     + #read~{}
 ```
 
-
-
 ### Considerations 
 We decided to avoid to manipulate classes as the receiver in the class definition (`Object << #Point` and not `#Object << #Point`)
 This is why we extensively use Symbols. This gives regularity and writers do not have to know if the classes they refer exist or not. 
-
-
 
 
 
@@ -117,26 +107,25 @@ Here is the Pharo program that creates a metamodel that can be rendered as the p
 #ComicSeries 
     --|> #AbstractSeries 
     + #toonAuthor @ String
-    
-#storyAuthor @ String + #print~{}
+    #storyAuthor @ String + #print~{}
 === 
 #AnimeSeries
     --|> #AbstractSeries 
     + #director @ String 
-    
-#animators @ String
-#voiceActors @ String
-+ #play~{} <>---<'based on'> #ComicSeries
+    #animators @ String
+    #voiceActors @ String
+    + #play~{} <>---<'based on'> #ComicSeries
 === 
-#ComicSeries     ---<'original'> #NovelSeries 
-extent: 600 @ 400
+#ComicSeries ---<'original'> #NovelSeries 
+
+    extent: 600 @ 400
 ```
 
 
 
 ```
 | uml builder |
-    uml := 
+uml := 
 #(abstract) % #AbstractSeries 
     + #name @ String 
     - #(abstract) % #numEpisodes @ Integer
