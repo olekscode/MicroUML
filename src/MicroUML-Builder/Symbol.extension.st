@@ -14,7 +14,8 @@ Symbol >> - aSymbol [
 
 { #category : '*MicroUML-Builder' }
 Symbol >> --|> aSymbolOrClass [
-
+	"Defines a subclass of the receiver. Note that this method is to define class description based on # e.g. #Point"
+	
 	^ MicroUMLAstBuilder new === self --|> aSymbolOrClass
 ]
 
@@ -26,6 +27,11 @@ Symbol >> <|-- aSymbolOrClass [
 
 { #category : '*MicroUML-Builder' }
 Symbol >> === aSymbolOrClass [
-
+	"Used to define a sequence of class definition e.g. 
+	
+	
+	
+	
+	"
 	^ MicroUMLAstBuilder new === self === aSymbolOrClass
 ]
