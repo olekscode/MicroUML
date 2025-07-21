@@ -8,6 +8,7 @@ MicroUML is a project to support a small syntax to describe class diagram.
 
 ## Example
 
+[](microUML.png)
 
 ```pharoscript
 #AbstractSeries 
