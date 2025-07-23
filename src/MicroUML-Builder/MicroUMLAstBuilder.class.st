@@ -34,6 +34,43 @@ Class {
 }
 
 { #category : 'examples' }
+MicroUMLAstBuilder class >> exampleMicrodown [
+
+	^ (MicrodownPresenter new document: '
+Example of novel and comic derrived from anime
+
+```pharoscript
+#AbstractSeries 
+	+ #name @ String 
+	- #numEpisodes @ Integer
+=== 
+#NovelSeries 
+	--|> #AbstractSeries
+	+ #author @ String 
+	+ #Publisher @ String 
+	+ #read~{}
+=== 
+#ComicSeries 
+	--|> #AbstractSeries 
+	+ #toonAuthor @ String
+	- #storyAuthor @ String 
+	+ #print~{} 
+=== 
+#AnimeSeries
+	--|> #AbstractSeries 
+	+ #director @ String 
+	- #animators @ String
+	- #voiceActors @ String 
+	+ #play~{} 
+	<>---<''based on''> #ComicSeries 
+=== 
+#AnimeSeries	 ---<''original''> #NovelSeries 
+extent: 600 @ 400
+```
+')  open
+]
+
+{ #category : 'examples' }
 MicroUMLAstBuilder class >> exampleSerie [
 
 	^ 
@@ -61,7 +98,8 @@ MicroUMLAstBuilder class >> exampleSerie [
 	+ #play~{} 
 	<>---<'based on'> #ComicSeries 
 === 
-#ComicSeries	 ---<'original'> #NovelSeries 
+#AnimeSeries	 ---<'original'> #NovelSeries 
+extent: 800@600
 ]
 
 { #category : 'UML - class separators' }
@@ -392,6 +430,16 @@ MicroUMLAstBuilder >> ensureClassAt: aSymbol [
 	^ classes at: aSymbol ifAbsentPut: [ self newClassNode ]
 ]
 
+{ #category : 'rendering' }
+MicroUMLAstBuilder >> extent: aPoint [
+
+	| canvas |
+	canvas := self newRoassalBuilder build.
+	aPoint isPoint ifTrue: [ canvas extent: aPoint ].
+	canvas zoomToFit.
+	^ canvas asForm
+]
+
 { #category : 'building' }
 MicroUMLAstBuilder >> finishAssociation: aSymbol [
 
@@ -447,6 +495,8 @@ MicroUMLAstBuilder >> newClassNode [
 MicroUMLAstBuilder >> newRoassalBuilder [
 
 	^ MicroUMLRoassalBuilder new
+		  astBuilder: self;
+		  yourself
 ]
 
 { #category : 'building' }

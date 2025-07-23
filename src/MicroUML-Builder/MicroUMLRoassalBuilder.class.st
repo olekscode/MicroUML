@@ -41,7 +41,7 @@ MicroUMLRoassalBuilder class >> exampleSerie [
 	- #animators @ String
 	- #voiceActors @ String 
 	+ #play~{} 
-	<'original'>---<'comicalize'> #ComicSeries 
+	<><'original'>---<'comicalize'> #ComicSeries 
 	<><'main'>---<'side stories'> #NovelSeries .
 	builder := MicroUMLRoassalBuilder new
 		           astBuilder: uml;
@@ -62,6 +62,62 @@ MicroUMLRoassalBuilder >> astBuilder: aMicroUMLAstBuilder [
 
 	astBuilder := aMicroUMLAstBuilder.
 	associationEdges := OrderedCollection new
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> attachPointFromBottomOf: aRSShape to: anotherRSShape [
+
+	| theta rect |
+	theta := ((GLine
+		           through: aRSShape encompassingRectangle center
+		           and: anotherRSShape encompassingRectangle center)
+		          angleWith: (GLine through: 0 @ 0 and: 0 @ 1))
+	         \\ (Float pi * 2).
+	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
+	rect := aRSShape encompassingRectangle.
+	^ rect bottomCenter + (theta / Float pi * rect width / 2.0 @ 0)
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> attachPointFromLeftOf: aRSShape to: anotherRSShape [
+
+	| theta rect |
+	theta := ((GLine
+		           through: aRSShape encompassingRectangle center
+		           and: anotherRSShape encompassingRectangle center)
+		          angleWith: (GLine through: 1 @ 0 and: 0 @ 0))
+	         \\ (Float pi * 2).
+	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
+	rect := aRSShape encompassingRectangle.
+	^ rect leftCenter + (0 @ (theta / Float pi * rect height / 2.0))
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> attachPointFromRightOf: aRSShape to: anotherRSShape [
+
+	| theta rect |
+	theta := ((GLine
+		           through: aRSShape encompassingRectangle center
+		           and: anotherRSShape encompassingRectangle center)
+		          angleWith: (GLine through: 1 @ 0 and: 0 @ 0))
+	         \\ (Float pi * 2).
+	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
+	rect := aRSShape encompassingRectangle.
+	^ rect rightCenter + (0 @ (theta / Float pi * rect height / 2.0))
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> attachPointFromTopOf: aRSShape to: anotherRSShape [
+
+	| theta rect |
+	theta := ((GLine
+		           through: aRSShape encompassingRectangle center
+		           and: anotherRSShape encompassingRectangle center)
+		          angleWith: (GLine through: 0 @ 0 and: 0 @ 1))
+	         \\ (Float pi * 2).
+	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
+	rect := aRSShape encompassingRectangle.
+	^ rect topCenter + (theta / Float pi * rect width / 2.0 @ 0)
 ]
 
 { #category : 'accessing' }
@@ -201,7 +257,7 @@ MicroUMLRoassalBuilder >> newInheritanceLinkBetween: aMicroUMLClassBox andSuperc
 
 	^ RSBezier new
 		  color: Color black;
-		  markerEnd: ((RSPolygon new
+		  markerStart: ((RSPolygon new
 				    points: {
 						    (-8 @ 8).
 						    (0 @ 0).
@@ -211,8 +267,8 @@ MicroUMLRoassalBuilder >> newInheritanceLinkBetween: aMicroUMLClassBox andSuperc
 				    borderWidth: 1;
 				    asMarker) offset: 4);
 		  attachPoint: RSBorderAttachPoint new;
-		  from: aMicroUMLClassBox;
-		  to: anotherMicroUMLClassBox;
+		  from: anotherMicroUMLClassBox;
+		  to: aMicroUMLClassBox;
 		  controlPointsController: RSVerticalCPAPController new;
 		  yourself
 ]
@@ -307,7 +363,7 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 	others2 := aRSCanvas nodes copyWithout: anotherRSShape.
 	((self isRightmostShape: aRSShape in: others1) and: [
 		 self isRightmostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| right |
+			| right point1 point2 |
 			right := (((others select: [ :shape |
 					            shape encompassingRectangle center y
 						            between: (aRSShape encompassingRectangle top min:
@@ -321,15 +377,17 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 			right := right
 			         + (right - (aRSShape encompassingRectangle right max:
 					           anotherRSShape encompassingRectangle right)) + margin.
+			point1 := self attachPointFromRightOf: aRSShape to: anotherRSShape.
+			point2 := self attachPointFromRightOf: anotherRSShape to: aRSShape.
 			aRSBezier controlPoints: {
-					aRSShape encompassingRectangle rightCenter.
-					(right @ aRSShape encompassingRectangle center y).
-					(right @ anotherRSShape encompassingRectangle center y).
-					anotherRSShape encompassingRectangle rightCenter }.
+					point1.
+					(right @ point1 y).
+					(right @ point2 y).
+					point2 }.
 			^ self ].
 	((self isLeftmostShape: aRSShape in: others1) and: [
 		 self isLeftmostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| left |
+			| left point1 point2 |
 			left := (((others select: [ :shape |
 					           shape encompassingRectangle center y
 						           between: (aRSShape encompassingRectangle top min:
@@ -343,15 +401,17 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 			left := left + ((aRSShape encompassingRectangle left min:
 				          anotherRSShape encompassingRectangle left) - left)
 			        - margin.
+			point1 := self attachPointFromLeftOf: aRSShape to: anotherRSShape.
+			point2 := self attachPointFromLeftOf: anotherRSShape to: aRSShape.
 			aRSBezier controlPoints: {
-					aRSShape encompassingRectangle leftCenter.
-					(left @ aRSShape encompassingRectangle center y).
-					(left @ anotherRSShape encompassingRectangle center y).
-					anotherRSShape encompassingRectangle leftCenter }.
+					point1.
+					(left @ point1 y).
+					(left @ point2 y).
+					point2 }.
 			^ self ].
 	((self isBottommostShape: aRSShape in: others1) and: [
 		 self isBottommostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| bottom |
+			| bottom point1 point2 |
 			bottom := (((others select: [ :shape |
 					             shape encompassingRectangle center x
 						             between: (aRSShape encompassingRectangle left min:
@@ -366,16 +426,17 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 			          + (bottom - (aRSShape encompassingRectangle bottom max:
 					            anotherRSShape encompassingRectangle bottom))
 			          + margin.
-
+			point1 := self attachPointFromBottomOf: aRSShape to: anotherRSShape.
+			point2 := self attachPointFromBottomOf: anotherRSShape to: aRSShape.
 			aRSBezier controlPoints: {
-					aRSShape encompassingRectangle bottomCenter.
-					(aRSShape encompassingRectangle center x @ bottom).
-					(anotherRSShape encompassingRectangle center x @ bottom).
-					anotherRSShape encompassingRectangle bottomCenter }.
+					point1.
+					(point1 x @ bottom).
+					(point2 x @ bottom).
+					point2 }.
 			^ self ].
 	((self isTopmostShape: aRSShape in: others1) and: [
 		 self isTopmostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| top |
+			| top point1 point2 |
 			top := (((others select: [ :shape |
 					          shape encompassingRectangle center x
 						          between: (aRSShape encompassingRectangle left min:
@@ -388,12 +449,13 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 				        shape encompassingRectangle top ]) min.
 			top := top + ((aRSShape encompassingRectangle top min:
 				         anotherRSShape encompassingRectangle top) - top) - margin.
-
+			point1 := self attachPointFromTopOf: aRSShape to: anotherRSShape.
+			point2 := self attachPointFromTopOf: anotherRSShape to: aRSShape.
 			aRSBezier controlPoints: {
-					aRSShape encompassingRectangle topCenter.
-					(aRSShape encompassingRectangle center x @ top).
-					(anotherRSShape encompassingRectangle center x @ top).
-					anotherRSShape encompassingRectangle topCenter }.
+					point1.
+					(point1 x @ top).
+					(point2 x @ top).
+					point2 }.
 			^ self ].
 
 	aRSBezier
@@ -449,7 +511,7 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 	RSTreeLayout new
 		verticalGap: self verticalGap;
 		horizontalGap: self horizontalGap;
-		on: nodes values asArray.
+		on: (nodes values as: RSGroup).
 	extraEdges do: [ :edge |
 			| leftNode rightNode |
 			leftNode := nodes at: edge model leftClass.
