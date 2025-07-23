@@ -20,7 +20,8 @@ Class >> --|> aSymbolOrClass [
 
 { #category : '*MicroUML-Builder' }
 Class >> <|-- aSymbolOrClass [
-
+	"Defines a subclass of the receiver. Note that this method is to mix real class and class description based on # e.g. #Point"
+	
 	^ MicroUMLAstBuilder new === self <|-- aSymbolOrClass
 ]
 
