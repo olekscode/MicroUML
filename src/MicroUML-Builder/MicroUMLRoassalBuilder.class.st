@@ -307,10 +307,9 @@ MicroUMLRoassalBuilder >> newMemberLabelFor: aMicroUMLMemberNode [
 	| label |
 	label := RSLabel
 		         text: (String streamContents: [ :stream |
-					          aMicroUMLMemberNode isPublic ifTrue: [
-						          stream nextPut: $+ ].
-					          aMicroUMLMemberNode isPrivate ifTrue: [
-						          stream nextPut: $- ].
+					          aMicroUMLMemberNode isPrivate
+						          ifTrue: [ stream nextPut: $- ]
+						          ifFalse: [ stream nextPut: Character space ].
 					          stream nextPutAll: aMicroUMLMemberNode name.
 					          aMicroUMLMemberNode argumentTypes ifNotNil: [
 							          :argumentTypes |
