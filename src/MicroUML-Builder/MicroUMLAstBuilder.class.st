@@ -43,12 +43,13 @@ Example of novel and comic derrived from anime
 #AbstractSeries 
 	+ #name @ String 
 	- #numEpisodes @ Integer
+	>+ #(abstract) % #findByName
 === 
 #NovelSeries 
 	--|> #AbstractSeries
 	+ #author @ String 
 	+ #Publisher @ String 
-	+ #read~{}
+	>+ #read~{}
 === 
 #ComicSeries 
 	--|> #AbstractSeries 
@@ -259,6 +260,31 @@ MicroUMLAstBuilder >> === aSymbolOrClassOrArray [
 MicroUMLAstBuilder >> > aClassOrSymbol [
 
 	self finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - attributes and methods' }
+MicroUMLAstBuilder >> >* aSymbolOrArray [
+
+	aSymbolOrArray isArray
+		ifTrue: [ self startMethodModifiers: aSymbolOrArray ]
+		ifFalse: [ self startMethod: (self getSymbol: aSymbolOrArray) ]
+]
+
+{ #category : 'UML - attributes and methods' }
+MicroUMLAstBuilder >> >+ aSymbolOrArray [
+
+	aSymbolOrArray isArray
+		ifTrue: [ self startPublicMethodModifiers: aSymbolOrArray ]
+		ifFalse: [ self startPublicMethod: (self getSymbol: aSymbolOrArray) ]
+]
+
+{ #category : 'UML - attributes and methods' }
+MicroUMLAstBuilder >> >- aSymbolOrArray [
+
+	aSymbolOrArray isArray
+		ifTrue: [ self startPrivateMethodModifiers: aSymbolOrArray ]
+		ifFalse: [
+		self startPrivateMethod: (self getSymbol: aSymbolOrArray) ]
 ]
 
 { #category : 'UML - associations' }
@@ -530,6 +556,20 @@ MicroUMLAstBuilder >> startMemberModifiers: anArrayOfSymbol [
 ]
 
 { #category : 'building' }
+MicroUMLAstBuilder >> startMethod: aSymbol [
+
+	(self currentClass addMember: aSymbol asSymbol) isMethod: true
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> startMethodModifiers: anArrayOfSymbol [
+
+	(self currentClass addMember: nil)
+		modifiers: anArrayOfSymbol;
+		isMethod: true
+]
+
+{ #category : 'building' }
 MicroUMLAstBuilder >> startPrivateMember: aSymbol [
 
 	(self currentClass addMember: aSymbol asSymbol) bePrivate
@@ -544,6 +584,23 @@ MicroUMLAstBuilder >> startPrivateMemberModifiers: anArrayOfSymbol [
 ]
 
 { #category : 'building' }
+MicroUMLAstBuilder >> startPrivateMethod: aSymbol [
+
+	(self currentClass addMember: aSymbol asSymbol)
+		isMethod: true;
+		bePrivate
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> startPrivateMethodModifiers: anArrayOfSymbol [
+
+	(self currentClass addMember: nil)
+		isMethod: true;
+		modifiers: anArrayOfSymbol;
+		bePrivate
+]
+
+{ #category : 'building' }
 MicroUMLAstBuilder >> startPublicMember: aSymbol [
 
 	(self currentClass addMember: aSymbol asSymbol) bePublic
@@ -553,6 +610,23 @@ MicroUMLAstBuilder >> startPublicMember: aSymbol [
 MicroUMLAstBuilder >> startPublicMemberModifiers: anArrayOfSymbol [
 
 	(self currentClass addMember: nil)
+		modifiers: anArrayOfSymbol;
+		bePublic
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> startPublicMethod: aSymbol [
+
+	(self currentClass addMember: aSymbol asSymbol)
+		isMethod: true;
+		bePublic
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> startPublicMethodModifiers: anArrayOfSymbol [
+
+	(self currentClass addMember: nil)
+		isMethod: true;
 		modifiers: anArrayOfSymbol;
 		bePublic
 ]

@@ -13,7 +13,8 @@ Class {
 		'type',
 		'isClassSide',
 		'isAbstract',
-		'modifiers'
+		'modifiers',
+		'isMethod'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -128,7 +129,13 @@ MicroUMLMemberNode >> isInstanceSide [
 { #category : 'testing' }
 MicroUMLMemberNode >> isMethod [
 
-	^ argumentTypes notNil
+	^ isMethod ifNil: [ argumentTypes notNil ]
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> isMethod: aBooleanOrNil [
+
+	isMethod := aBooleanOrNil
 ]
 
 { #category : 'testing' }
