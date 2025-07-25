@@ -73,7 +73,7 @@ We use `===` to link multiple class definitions.
     --|> #AbstractSeries
     + #author @ String 
     + #Publisher @ String 
-    + #read~{}
+    >+ #read~{}
 ```
 
 ### Considerations 
@@ -103,20 +103,20 @@ Here is the Pharo program that creates a metamodel that can be rendered as the p
     --|> #AbstractSeries
     + #author @ String 
     + #Publisher @ String 
-    + #read~{}
+    >+ #read~{}
 === 
 #ComicSeries 
     --|> #AbstractSeries 
     + #toonAuthor @ String
     * #storyAuthor @ String
-    + #print~{}
+    >+ #print~{}
 === 
 #AnimeSeries
     --|> #AbstractSeries 
     + #director @ String 
     * #animators @ String
     * #voiceActors @ String
-    + #play~{} <>---<'based on'> #ComicSeries
+    >+ #play~{} <>---<'based on'> #ComicSeries
 === 
 #ComicSeries ---<'original'> #NovelSeries 
 
@@ -131,26 +131,26 @@ uml :=
 #(abstract) % #AbstractSeries 
     + #name @ String 
     - #(abstract) % #numEpisodes @ Integer
-    + #(static) % #findByName ~ {#String} @ #AbstractSeries
+    >+ #(static) % #findByName ~ {#String} @ #AbstractSeries
 === 
 #NovelSeries 
     --|> #AbstractSeries
     + #author @ String 
     * #Publisher @ String 
-    + #read~{}
+    >+ #read~{}
 === 
 #ComicSeries 
     --|> #AbstractSeries 
     + #toonAuthor @ String
     * #storyAuthor @ String 
-    + #print~{} 
+    >+ #print~{} 
 === 
 #AnimeSeries
     --|> #AbstractSeries 
     + #director @ String 
     - #animators @ String
     - #voiceActors @ String 
-    + #play~{} 
+    >+ #play~{} 
     <'original'>---<'comicalize'> #ComicSeries 
     <><'main'>---<'side stories'> #NovelSeries .
     builder := MicroUMLRoassalBuilder new
