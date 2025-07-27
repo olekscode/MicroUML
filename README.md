@@ -37,7 +37,7 @@ The message `-`, `+`, `*` are used to add members to a UmlClassBox
 ```
 #AbstractSeries
     - #read~{}
-    + #printOn:~{s @Stream}
+    >+ #printOn:~{s @Stream}
 ```
 
 #### Class variable and class methods
@@ -45,7 +45,7 @@ The message `-`, `+`, `*` are used to add members to a UmlClassBox
 ```
 #AbstractSeries
     $ ClassVar @ #Float
-    + #(static) % #findByName ~ {#String} @ #AbstractSeries
+    >+ #(static) % #findByName ~ {#String} @ #AbstractSeries
 ```
 
 #### Relations
