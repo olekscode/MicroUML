@@ -69,6 +69,14 @@ MicroUMLClassNode class >> exampleRoassal [
 ]
 
 { #category : 'adding' }
+MicroUMLClassNode >> addAttribute: aSymbolOrNil [
+
+	^ members at: aSymbolOrNil put: (self memberNodeClass new
+			   name: aSymbolOrNil;
+			   isMethod: false)
+]
+
+{ #category : 'adding' }
 MicroUMLClassNode >> addMember: aSymbolOrNil [
 
 	^ members
