@@ -200,28 +200,46 @@ MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 		           model: aMicroUMLClassNode.
 	aMicroUMLClassNode isAbstract ifTrue: [
 		myLabel emphasis: TextEmphasis italic ].
+	myLabel extent x < 100 ifTrue: [
+		myLabel extent: 100 @ myLabel extent y ].
+
 	attributeShapes := aMicroUMLClassNode attributesCollect: [ :attribute |
 		                   self newMemberLabelFor: attribute ].
-	RSVerticalLineLayout new alignLeft on: attributeShapes.
+	RSVerticalLineLayout new
+		alignLeft;
+		on: attributeShapes.
 	attributeShapes := attributeShapes asShape.
+
 	methodShapes := aMicroUMLClassNode methodsCollect: [ :method |
 		                self newMemberLabelFor: method ].
-	RSVerticalLineLayout new alignLeft on: methodShapes.
+	RSVerticalLineLayout new
+		alignLeft;
+		on: methodShapes.
 	methodShapes := methodShapes asShape.
-	RSVerticalLineLayout new alignLeft on: {
-			attributeShapes.
-			methodShapes }.
+
+	RSVerticalLineLayout new
+		alignLeft;
+		gapSize: 10;
+		on: {
+				attributeShapes.
+				methodShapes }.
 	memberShapes := {
 		                attributeShapes.
 		                methodShapes } asShape.
-	RSVerticalLineLayout new alignCenter on: {
-			myLabel.
-			memberShapes }.
+
+	myLabel extent x < memberShapes extent x ifTrue: [
+		myLabel extent: memberShapes extent x @ myLabel extent y ].
+	RSVerticalLineLayout new
+		alignLeft;
+		gapSize: 10;
+		on: {
+				myLabel.
+				memberShapes }.
 	rect := {
 		        myLabel.
 		        memberShapes } asShape encompassingRectangle.
-	y1 := myLabel encompassingRectangle bottom + 6.
-	y2 := y1 + attributeShapes encompassingRectangle height.
+	y1 := myLabel encompassingRectangle bottom + 5.
+	y2 := y1 + attributeShapes encompassingRectangle height + 10.
 
 	^ {
 		  (RSBox new
