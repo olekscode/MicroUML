@@ -263,14 +263,6 @@ MicroUMLAstBuilder >> > aClassOrSymbol [
 ]
 
 { #category : 'UML - attributes and methods' }
-MicroUMLAstBuilder >> >* aSymbolOrArray [
-
-	aSymbolOrArray isArray
-		ifTrue: [ self startMethodModifiers: aSymbolOrArray ]
-		ifFalse: [ self startMethod: (self getSymbol: aSymbolOrArray) ]
-]
-
-{ #category : 'UML - attributes and methods' }
 MicroUMLAstBuilder >> >+ aSymbolOrArray [
 
 	aSymbolOrArray isArray
@@ -329,6 +321,14 @@ MicroUMLAstBuilder >> ><> aClassOrSymbol [
 	self
 		addAssociationRightHead: #aggregation;
 		finishAssociation: (self getSymbol: aClassOrSymbol)
+]
+
+{ #category : 'UML - attributes and methods' }
+MicroUMLAstBuilder >> >> aSymbolOrArray [
+
+	aSymbolOrArray isArray
+		ifTrue: [ self startMethodModifiers: aSymbolOrArray ]
+		ifFalse: [ self startMethod: (self getSymbol: aSymbolOrArray) ]
 ]
 
 { #category : 'UML - attributes and methods' }
