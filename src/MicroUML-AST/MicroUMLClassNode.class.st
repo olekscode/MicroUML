@@ -267,7 +267,7 @@ MicroUMLClassNode >> modifiers [
 { #category : 'accessing' }
 MicroUMLClassNode >> modifiers: anArrayOfSymbol [
 
-	(anArrayOfSymbol includes: #abstract) ifTrue: [ self beAbstract ]
+	isAbstract := anArrayOfSymbol includes: #abstract
 ]
 
 { #category : 'accessing' }

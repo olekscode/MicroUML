@@ -162,8 +162,8 @@ MicroUMLMemberNode >> modifiers [
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers: anArrayOfSymbol [
 
-	(anArrayOfSymbol includes: #abstract) ifTrue: [ self beAbstract ].
-	(anArrayOfSymbol includes: #static) ifTrue: [ self beClassSide ]
+	isAbstract := anArrayOfSymbol includes: #abstract.
+	isClassSide := anArrayOfSymbol includes: #static
 ]
 
 { #category : 'accessing' }
