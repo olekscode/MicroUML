@@ -375,7 +375,7 @@ MicroUMLAstBuilder >> addClassName: aSymbol [
 { #category : 'building' }
 MicroUMLAstBuilder >> addMemberName: aSymbol [
 
-	currentClass currentMember name: aSymbol
+	currentClass currentMemberName: aSymbol
 ]
 
 { #category : 'building' }

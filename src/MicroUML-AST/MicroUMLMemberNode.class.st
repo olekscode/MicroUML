@@ -13,7 +13,6 @@ Class {
 		'type',
 		'isClassSide',
 		'isAbstract',
-		'modifiers',
 		'isMethod'
 	],
 	#category : 'MicroUML-AST',
@@ -185,9 +184,9 @@ MicroUMLMemberNode >> type [
 ]
 
 { #category : 'accessing' }
-MicroUMLMemberNode >> type: anObject [
+MicroUMLMemberNode >> type: aSymbol [
 
-	type := anObject
+	type := aSymbol
 ]
 
 { #category : 'accessing' }
