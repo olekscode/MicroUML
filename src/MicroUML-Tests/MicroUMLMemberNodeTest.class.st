@@ -120,7 +120,7 @@ MicroUMLMemberNodeTest >> testModifiers [
 	self assert: member modifiers equals: #( abstract ).
 	self deny: member isClassSide.
 	member modifiers: #( static ).
-	self assert: member isAbstract.
+	self deny: member isAbstract.
 	self assert: member isClassSide.
 	self assert: member modifiers equals: #( static )
 ]

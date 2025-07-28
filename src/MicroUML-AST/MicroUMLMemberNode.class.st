@@ -153,15 +153,17 @@ MicroUMLMemberNode >> isPublic [
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers [
 
-	^ modifiers
+	^ (Array streamContents: [ :stream |
+			   self isAbstract ifTrue: [ stream nextPut: #abstract ].
+			   self isClassSide ifTrue: [ stream nextPut: #static ] ])
+		  ifEmpty: [ nil ]
 ]
 
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers: anArrayOfSymbol [
 
-	modifiers := anArrayOfSymbol.
-	(modifiers includes: #abstract) ifTrue: [ self beAbstract ].
-	(modifiers includes: #static) ifTrue: [ self beClassSide ]
+	isAbstract := anArrayOfSymbol includes: #abstract.
+	isClassSide := anArrayOfSymbol includes: #static
 ]
 
 { #category : 'accessing' }
