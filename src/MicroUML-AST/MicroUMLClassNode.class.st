@@ -11,10 +11,7 @@ Class {
 		'name',
 		'superclass',
 		'members',
-		'attributes',
-		'methods',
-		'isAbstract',
-		'modifiers'
+		'isAbstract'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -262,14 +259,15 @@ MicroUMLClassNode >> methodsDo: aBlock [
 { #category : 'accessing' }
 MicroUMLClassNode >> modifiers [
 
-	^ modifiers
+	^ (Array streamContents: [ :stream |
+		   self isAbstract ifTrue: [ stream nextPut: #abstract ] ])
+		  ifEmpty: [ nil ]
 ]
 
 { #category : 'accessing' }
 MicroUMLClassNode >> modifiers: anArrayOfSymbol [
 
-	modifiers := anArrayOfSymbol.
-	(modifiers includes: #abstract) ifTrue: [ self beAbstract ]
+	(anArrayOfSymbol includes: #abstract) ifTrue: [ self beAbstract ]
 ]
 
 { #category : 'accessing' }
