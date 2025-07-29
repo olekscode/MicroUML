@@ -43,6 +43,14 @@ MicroUMLClassNode >> addMember: aSymbolOrNil [
 	^ members add: (self memberNodeClass new name: aSymbolOrNil)
 ]
 
+{ #category : 'adding' }
+MicroUMLClassNode >> addMethod: aSymbolOrNil [
+
+	^ members add: (self memberNodeClass new
+			   name: aSymbolOrNil;
+			   isMethod: true)
+]
+
 { #category : 'converting' }
 MicroUMLClassNode >> asRSShape [
 
@@ -88,10 +96,10 @@ MicroUMLClassNode >> asRSShape [
 { #category : 'accessing' }
 MicroUMLClassNode >> attributeAt: aSymbol [
 
-	^ (self memberAt: aSymbol) ifNotNil: [ :member |
-			  member isAttribute
-				  ifTrue: [ member ]
-				  ifFalse: [ nil ] ]
+	^ members
+		  detect: [ :member |
+		  member name = aSymbol and: [ member isAttribute ] ]
+		  ifNone: [ nil ]
 ]
 
 { #category : 'accessing' }
@@ -195,10 +203,10 @@ MicroUMLClassNode >> membersDo: aBlock [
 { #category : 'accessing' }
 MicroUMLClassNode >> methodAt: aSymbol [
 
-	^ (self memberAt: aSymbol) ifNotNil: [ :member |
-			  member isMethod
-				  ifTrue: [ member ]
-				  ifFalse: [ nil ] ]
+	^ members
+		  detect: [ :member |
+		  member name = aSymbol and: [ member isMethod ] ]
+		  ifNone: [ nil ]
 ]
 
 { #category : 'accessing' }
@@ -244,6 +252,30 @@ MicroUMLClassNode >> name [
 MicroUMLClassNode >> name: aSymbol [
 
 	name := aSymbol asSymbol
+]
+
+{ #category : 'printing' }
+MicroUMLClassNode >> printMicroUMLOn: aStream [
+
+	self modifiers ifNotNil: [ :modifiers |
+			aStream nextPutAll: '{ '.
+			modifiers
+				do: [ :modifier | modifier storeOn: aStream ]
+				separatedBy: [ aStream nextPutAll: ' . ' ].
+			aStream nextPutAll: ' } % ' ].
+	self name asSymbol storeOn: aStream.
+	self superclass ifNotNil: [ :superclassName |
+			aStream nextPutAll: ' --|> '.
+			superclassName asSymbol storeOn: aStream ].
+	self members ifNotEmpty: [
+			aStream cr.
+			self members
+				do: [ :member |
+						aStream
+							space;
+							space.
+						member printMicroUMLOn: aStream ]
+				separatedBy: [ aStream cr ] ]
 ]
 
 { #category : 'accessing' }

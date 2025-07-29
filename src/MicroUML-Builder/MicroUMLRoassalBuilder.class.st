@@ -470,14 +470,15 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 			nodes at: classAst name put: node ].
 	classDiagramNode classesDo: [ :classAst |
 			classAst superclass ifNotNil: [ :superclassName |
-					| link |
-					link := self
-						        newInheritanceLinkBetween: (nodes at: classAst name)
-						        andSuperclass: (nodes at: superclassName).
-					connectedNodes
-						add: (nodes at: classAst name);
-						add: (nodes at: superclassName).
-					aRSCanvas add: link ] ].
+					(nodes includesKey: superclassName) ifTrue: [
+							| link |
+							link := self
+								        newInheritanceLinkBetween: (nodes at: classAst name)
+								        andSuperclass: (nodes at: superclassName).
+							connectedNodes
+								add: (nodes at: classAst name);
+								add: (nodes at: superclassName).
+							aRSCanvas add: link ] ] ].
 	classDiagramNode associationsDo: [ :associationNode |
 			| edge leftNode rightNode |
 			leftNode := nodes at: associationNode leftClass.
