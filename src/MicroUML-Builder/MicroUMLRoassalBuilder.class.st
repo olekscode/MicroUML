@@ -193,59 +193,69 @@ MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 		myLabel emphasis: TextEmphasis italic ].
 	myLabel extent x < 100 ifTrue: [
 		myLabel extent: 100 @ myLabel extent y ].
+	aMicroUMLClassNode isEmptyDefinition
+		ifTrue: [
+				^ {
+					  (RSBox new
+						   extent: myLabel extent + (10 @ 6);
+						   color: Color white;
+						   borderColor: Color black;
+						   borderWidth: 1).
+					  myLabel } asShapeFor: aMicroUMLClassNode ]
+		ifFalse: [
+				attributeShapes := aMicroUMLClassNode attributesCollect: [
+					                   :attribute |
+					                   self newMemberLabelFor: attribute ].
+				RSVerticalLineLayout new
+					alignLeft;
+					on: attributeShapes.
+				attributeShapes := attributeShapes asShape.
 
-	attributeShapes := aMicroUMLClassNode attributesCollect: [ :attribute |
-		                   self newMemberLabelFor: attribute ].
-	RSVerticalLineLayout new
-		alignLeft;
-		on: attributeShapes.
-	attributeShapes := attributeShapes asShape.
+				methodShapes := aMicroUMLClassNode methodsCollect: [ :method |
+					                self newMemberLabelFor: method ].
+				RSVerticalLineLayout new
+					alignLeft;
+					on: methodShapes.
+				methodShapes := methodShapes asShape.
 
-	methodShapes := aMicroUMLClassNode methodsCollect: [ :method |
-		                self newMemberLabelFor: method ].
-	RSVerticalLineLayout new
-		alignLeft;
-		on: methodShapes.
-	methodShapes := methodShapes asShape.
+				RSVerticalLineLayout new
+					alignLeft;
+					gapSize: 10;
+					on: {
+							attributeShapes.
+							methodShapes }.
+				memberShapes := {
+					                attributeShapes.
+					                methodShapes } asShape.
 
-	RSVerticalLineLayout new
-		alignLeft;
-		gapSize: 10;
-		on: {
-				attributeShapes.
-				methodShapes }.
-	memberShapes := {
-		                attributeShapes.
-		                methodShapes } asShape.
+				myLabel extent x < memberShapes extent x ifTrue: [
+					myLabel extent: memberShapes extent x @ myLabel extent y ].
+				RSVerticalLineLayout new
+					alignLeft;
+					gapSize: 10;
+					on: {
+							myLabel.
+							memberShapes }.
+				rect := {
+					        myLabel.
+					        memberShapes } asShape encompassingRectangle.
+				y1 := myLabel encompassingRectangle bottom + 5.
+				y2 := y1 + attributeShapes encompassingRectangle height + 10.
 
-	myLabel extent x < memberShapes extent x ifTrue: [
-		myLabel extent: memberShapes extent x @ myLabel extent y ].
-	RSVerticalLineLayout new
-		alignLeft;
-		gapSize: 10;
-		on: {
-				myLabel.
-				memberShapes }.
-	rect := {
-		        myLabel.
-		        memberShapes } asShape encompassingRectangle.
-	y1 := myLabel encompassingRectangle bottom + 5.
-	y2 := y1 + attributeShapes encompassingRectangle height + 10.
-
-	^ {
-		  (RSBox new
-			   extent: rect extent + (10 @ 6);
-			   color: Color white;
-			   borderColor: Color black;
-			   borderWidth: 1).
-		  (RSLine new
-			   startPoint: rect extent x / -2 - 5 @ y1;
-			   endPoint: rect extent x / 2 + 5 @ y1).
-		  (RSLine new
-			   startPoint: rect extent x / -2 - 5 @ y2;
-			   endPoint: rect extent x / 2 + 5 @ y2).
-		  myLabel.
-		  memberShapes } asShapeFor: aMicroUMLClassNode
+				^ {
+					  (RSBox new
+						   extent: rect extent + (10 @ 6);
+						   color: Color white;
+						   borderColor: Color black;
+						   borderWidth: 1).
+					  (RSLine new
+						   startPoint: rect extent x / -2 - 5 @ y1;
+						   endPoint: rect extent x / 2 + 5 @ y1).
+					  (RSLine new
+						   startPoint: rect extent x / -2 - 5 @ y2;
+						   endPoint: rect extent x / 2 + 5 @ y2).
+					  myLabel.
+					  memberShapes } asShapeFor: aMicroUMLClassNode ]
 ]
 
 { #category : 'instance creation' }
