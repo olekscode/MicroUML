@@ -5,7 +5,7 @@ My visibility is either #public or #private.
 "
 Class {
 	#name : 'MicroUMLMemberNode',
-	#superclass : 'Object',
+	#superclass : 'MicroUMLAstNode',
 	#instVars : [
 		'name',
 		'argumentTypes',

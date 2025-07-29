@@ -33,6 +33,12 @@ Class {
 	#package : 'MicroUML-Builder'
 }
 
+{ #category : 'UML - class separators' }
+MicroUMLAstBuilder class >> === aSymbolOrClassOrArray [
+
+	^ self new === aSymbolOrClassOrArray
+]
+
 { #category : 'examples' }
 MicroUMLAstBuilder class >> exampleMicrodown [
 
@@ -99,8 +105,7 @@ MicroUMLAstBuilder class >> exampleSerie [
 	+ #play~{} 
 	<>---<'based on'> #ComicSeries 
 === 
-#AnimeSeries	 ---<'original'> #NovelSeries 
-extent: 800@600
+#AnimeSeries	 ---<'original'> #NovelSeries
 ]
 
 { #category : 'UML - class separators' }
@@ -451,6 +456,21 @@ MicroUMLAstBuilder >> currentClass [
 ]
 
 { #category : 'accessing' }
+MicroUMLAstBuilder >> diagram [
+
+	^ self diagramClass new
+		  classes: classes values;
+		  associations: associations;
+		  yourself
+]
+
+{ #category : 'class access' }
+MicroUMLAstBuilder >> diagramClass [
+
+	^ MicroUMLClassDiagramNode
+]
+
+{ #category : 'accessing' }
 MicroUMLAstBuilder >> ensureClassAt: aSymbol [
 
 	^ classes at: aSymbol ifAbsentPut: [ self newClassNode ]
@@ -521,7 +541,7 @@ MicroUMLAstBuilder >> newClassNode [
 MicroUMLAstBuilder >> newRoassalBuilder [
 
 	^ MicroUMLRoassalBuilder new
-		  astBuilder: self;
+		  classDiagramNode: self diagram;
 		  yourself
 ]
 

@@ -6,7 +6,7 @@ Multiplicity is nil iff no multiplicity is set to the class.
 "
 Class {
 	#name : 'MicroUMLAssociationNode',
-	#superclass : 'Object',
+	#superclass : 'MicroUMLAstNode',
 	#instVars : [
 		'leftClass',
 		'leftHead',
