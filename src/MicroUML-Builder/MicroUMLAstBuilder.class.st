@@ -458,14 +458,14 @@ MicroUMLAstBuilder >> currentClass [
 { #category : 'accessing' }
 MicroUMLAstBuilder >> diagram [
 
-	^ self diagramClass new
+	^ self diagramNodeClass new
 		  classes: classes values;
 		  associations: associations;
 		  yourself
 ]
 
 { #category : 'class access' }
-MicroUMLAstBuilder >> diagramClass [
+MicroUMLAstBuilder >> diagramNodeClass [
 
 	^ MicroUMLClassDiagramNode
 ]
