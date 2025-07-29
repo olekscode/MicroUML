@@ -93,3 +93,61 @@ MicroUMLClassDiagramNode >> initialize [
 	classes := OrderedDictionary new.
 	associations := OrderedDictionary new
 ]
+
+{ #category : 'printing' }
+MicroUMLClassDiagramNode >> printMicroUMLOn: aStream [
+
+	self printMicroUMLOn: aStream associationsUnderClasses: true
+]
+
+{ #category : 'printing' }
+MicroUMLClassDiagramNode >> printMicroUMLOn: aStream associationsUnderClasses: aBoolean [
+
+	aBoolean = true
+		ifTrue: [ self printMicroUMLWithAssociationsUnderClassesOn: aStream ]
+		ifFalse: [
+		self printMicroUMLWithAssociationsOutsideClassesOn: aStream ]
+]
+
+{ #category : 'printing' }
+MicroUMLClassDiagramNode >> printMicroUMLWithAssociationsOutsideClassesOn: aStream [
+
+	aStream nextPutAll: self astBuilderClass name.
+	self classesDo: [ :classNode |
+			classNode isEmptyDefinition ifFalse: [
+					aStream
+						cr;
+						nextPutAll: '===';
+						cr.
+					classNode printMicroUMLOn: aStream ] ].
+	self associationsDo: [ :associationNode |
+			aStream
+				cr;
+				nextPutAll: '===';
+				cr.
+			associationNode printMicroUMLOn: aStream ]
+]
+
+{ #category : 'printing' }
+MicroUMLClassDiagramNode >> printMicroUMLWithAssociationsUnderClassesOn: aStream [
+
+	aStream nextPutAll: self astBuilderClass name.
+	self classesDo: [ :classNode |
+			aStream
+				cr;
+				nextPutAll: '===';
+				cr.
+			classNode printMicroUMLOn: aStream.
+			(self associationsForLeftClass: classNode name) ifNotEmpty: [
+					:assocs |
+					(classNode isEmptyDefinition and: [ assocs size = 1 ])
+						ifTrue: [
+								aStream space.
+								assocs first printMicroUMLInLeftClassOn: aStream ]
+						ifFalse: [
+								assocs do: [ :associationNode |
+										aStream
+											cr;
+											nextPutAll: '  '.
+										associationNode printMicroUMLInLeftClassOn: aStream ] ] ] ]
+]

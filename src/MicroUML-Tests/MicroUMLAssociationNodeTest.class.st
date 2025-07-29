@@ -6,6 +6,24 @@ Class {
 }
 
 { #category : 'tests' }
+MicroUMLAssociationNodeTest >> testPrintMicroUMLInLeftClassOn [
+
+	| association |
+	association := (MicroUMLAstBuilder new === #Foo --- #Bar)
+		               associations first.
+	self
+		assert: (String streamContents: [ :stream |
+				 association printMicroUMLInLeftClassOn: stream ])
+		equals: '--- #Bar'.
+	association := (MicroUMLAstBuilder new === #Foo <>< 'bar' >---< 'baz'
+	                ><*> #Quuux) associations first.
+	self
+		assert: (String streamContents: [ :stream |
+				 association printMicroUMLInLeftClassOn: stream ])
+		equals: '<><''bar''>---<''baz''><*> #Quuux'
+]
+
+{ #category : 'tests' }
 MicroUMLAssociationNodeTest >> testPrintMicroUMLOn [
 
 	| association |

@@ -56,16 +56,13 @@ MicroUMLAssociationNode >> leftLabel: aStringOrNil [
 ]
 
 { #category : 'printing' }
-MicroUMLAssociationNode >> printMicroUMLOn: aStream [
+MicroUMLAssociationNode >> printMicroUMLInLeftClassOn: aStream [
 
 	| heads |
 	heads := {
 		         (#composition -> '<*>').
 		         (#aggregation -> '<>') } asDictionary.
-	leftClass storeOn: aStream.
-	aStream
-		space;
-		nextPutAll: (heads at: leftHead ifAbsent: [ '' ]).
+	aStream nextPutAll: (heads at: leftHead ifAbsent: [ '' ]).
 	leftLabel ifNotNil: [
 			aStream nextPut: $<.
 			leftLabel storeOn: aStream.
@@ -79,6 +76,14 @@ MicroUMLAssociationNode >> printMicroUMLOn: aStream [
 		nextPutAll: (heads at: rightHead ifAbsent: [ '' ]);
 		space.
 	rightClass storeOn: aStream
+]
+
+{ #category : 'printing' }
+MicroUMLAssociationNode >> printMicroUMLOn: aStream [
+
+	leftClass storeOn: aStream.
+	aStream space.
+	self printMicroUMLInLeftClassOn: aStream
 ]
 
 { #category : 'accessing' }
