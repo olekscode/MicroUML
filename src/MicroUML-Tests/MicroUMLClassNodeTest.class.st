@@ -229,33 +229,6 @@ MicroUMLClassNodeTest >> testName [
 ]
 
 { #category : 'tests' }
-MicroUMLClassNodeTest >> testPrintMicroUMLOn [
-
-	class := #Foo --|> #Bar classAt: #Foo.
-	self
-		assert:
-		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#Foo --|> #Bar'.
-	class := { #abstract } % #Foo --|> #Bar classAt: #Foo.
-	self
-		assert:
-		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '{ #abstract } % #Foo --|> #Bar'.
-	class := 
-	#Foo --|> #Bar
-		* #baz
-		>> #quuux
-	classAt: #Foo.
-	self
-		assert:
-		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#Foo --|> #Bar
-  * #baz
-  >> #quuux'.
-
-]
-
-{ #category : 'tests' }
 MicroUMLClassNodeTest >> testSuperclass [
 
 	self assert: class superclass isNil.

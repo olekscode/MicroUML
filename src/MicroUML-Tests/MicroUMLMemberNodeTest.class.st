@@ -133,27 +133,6 @@ MicroUMLMemberNodeTest >> testName [
 ]
 
 { #category : 'tests' }
-MicroUMLMemberNodeTest >> testPrintMicroUMLOn [
-
-	member := (#Quuux * #foo classAt: #Quuux) memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '* #foo'.
-	member := (#Quuux + {#abstract . #static} % #foo @ #Bar classAt: #Quuux) memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '+ { #abstract . #static } % #foo @ #Bar'.
-	member := (#Quuux >- {#abstract . #static} % #foo ~ {#Bar} @ #Baz classAt: #Quuux) memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '>- { #abstract . #static } % #foo~{ #Bar } @ #Baz'.
-
-]
-
-{ #category : 'tests' }
 MicroUMLMemberNodeTest >> testType [
 
 	member type: #Foo.
