@@ -6,7 +6,7 @@ I also hold my superclass (symbol).
 "
 Class {
 	#name : 'MicroUMLClassNode',
-	#superclass : 'Object',
+	#superclass : 'MicroUMLAstNode',
 	#instVars : [
 		'name',
 		'superclass',
@@ -29,46 +29,10 @@ MicroUMLClassNode class >> exampleComixSerie [
 	^ MicroUMLAstBuilder exampleSerie classAt: #ComixSerie
 ]
 
-{ #category : 'examples' }
-MicroUMLClassNode class >> exampleRoassal [
-
-	| canvas node1 node2 inheritance |
-	canvas := RSCanvas new.
-	canvas
-		addShape: (node1 := self exampleAbstractSerie asRSShape);
-		addShape:
-			(node2 := self exampleComixSerie asRSShape position: 0 @ 200).
-	inheritance := RSLine new
-		               color: Color black;
-		               markerEnd: ((RSPolygon new
-	points: {
-			(-8 @ 8).
-			(0 @ 0).
-			(8 @ 8) };
-	color: Color white;
-	borderColor: Color black;
-	borderWidth: 1;
-	asMarker) offset: 4);
-		               attachPoint: RSBorderAttachPoint new;
-		               from: node2;
-		               to: node1;
-		               yourself.
-	canvas
-		addNode: node1;
-		addNode: node2;
-		addEdge: inheritance;
-		addShape: inheritance.
-	RSTreeLayout on: canvas nodes.
-	canvas @ RSCanvasController.
-	canvas
-		zoomToFit;
-		open
-]
-
 { #category : 'adding' }
 MicroUMLClassNode >> addAttribute: aSymbolOrNil [
 
-	^ members at: aSymbolOrNil put: (self memberNodeClass new
+	^ members add: (self memberNodeClass new
 			   name: aSymbolOrNil;
 			   isMethod: false)
 ]
@@ -76,9 +40,7 @@ MicroUMLClassNode >> addAttribute: aSymbolOrNil [
 { #category : 'adding' }
 MicroUMLClassNode >> addMember: aSymbolOrNil [
 
-	^ members
-		  at: aSymbolOrNil
-		  put: (self memberNodeClass new name: aSymbolOrNil)
+	^ members add: (self memberNodeClass new name: aSymbolOrNil)
 ]
 
 { #category : 'converting' }
@@ -141,7 +103,7 @@ MicroUMLClassNode >> attributes [
 { #category : 'enumerating' }
 MicroUMLClassNode >> attributesCollect: aBlock [
 
-	^ members values select: #isAttribute thenCollect: aBlock
+	^ (members select: #isAttribute thenCollect: aBlock) asArray
 ]
 
 { #category : 'enumerating' }
@@ -166,23 +128,20 @@ MicroUMLClassNode >> beConcrete [
 { #category : 'accessing' }
 MicroUMLClassNode >> currentMember [
 
-	^ members values last
+	^ members last
 ]
 
 { #category : 'adding' }
 MicroUMLClassNode >> currentMemberName: aSymbol [
 
-	| member |
-	member := self currentMember.
-	members removeKey: member name.
-	member name: aSymbol.
-	members at: member name put: member
+	self currentMember name: aSymbol.
+	^ aSymbol
 ]
 
 { #category : 'initialization' }
 MicroUMLClassNode >> initialize [
 
-	members := OrderedDictionary new.
+	members := OrderedCollection new.
 	isAbstract := false
 ]
 
@@ -198,10 +157,15 @@ MicroUMLClassNode >> isConcrete [
 	^ self isAbstract not
 ]
 
+{ #category : 'testing' }
+MicroUMLClassNode >> isEmptyDefinition [
+	^ superclass isNil and: [members isEmpty and: [ isAbstract not ]]
+]
+
 { #category : 'accessing' }
 MicroUMLClassNode >> memberAt: aSymbol [
 
-	^ members at: aSymbol ifAbsent: [ ]
+	^ members detect: [ :member | member name = aSymbol ] ifNone: [ ]
 ]
 
 { #category : 'class access' }
@@ -213,19 +177,19 @@ MicroUMLClassNode >> memberNodeClass [
 { #category : 'accessing' }
 MicroUMLClassNode >> members [
 
-	^ members values
+	^ members asArray
 ]
 
 { #category : 'enumerating' }
 MicroUMLClassNode >> membersCollect: aBlock [
 
-	^ members values collect: aBlock
+	^ (members collect: aBlock) asArray
 ]
 
 { #category : 'enumerating' }
 MicroUMLClassNode >> membersDo: aBlock [
 
-	members valuesDo: aBlock
+	members do: aBlock
 ]
 
 { #category : 'accessing' }
@@ -246,7 +210,7 @@ MicroUMLClassNode >> methods [
 { #category : 'enumerating' }
 MicroUMLClassNode >> methodsCollect: aBlock [
 
-	^ members values select: #isMethod thenCollect: aBlock
+	^ (members select: #isMethod thenCollect: aBlock) asArray
 ]
 
 { #category : 'enumerating' }

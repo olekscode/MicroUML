@@ -6,8 +6,7 @@ Class {
 	#name : 'MicroUMLRoassalBuilder',
 	#superclass : 'RSBuilder',
 	#instVars : [
-		'astBuilder',
-		'associationEdges'
+		'classDiagramNode'
 	],
 	#category : 'MicroUML-Builder',
 	#package : 'MicroUML-Builder'
@@ -44,24 +43,11 @@ MicroUMLRoassalBuilder class >> exampleSerie [
 	<><'original'>---<'comicalize'> #ComicSeries 
 	<><'main'>---<'side stories'> #NovelSeries .
 	builder := MicroUMLRoassalBuilder new
-		           astBuilder: uml;
+		           classDiagramNode: uml diagram;
 		           build.
 	builder
 		@ RSCanvasController;
 		open
-]
-
-{ #category : 'accessing' }
-MicroUMLRoassalBuilder >> astBuilder [
-
-	^ astBuilder
-]
-
-{ #category : 'accessing' }
-MicroUMLRoassalBuilder >> astBuilder: aMicroUMLAstBuilder [
-
-	astBuilder := aMicroUMLAstBuilder.
-	associationEdges := OrderedCollection new
 ]
 
 { #category : 'private' }
@@ -121,6 +107,18 @@ MicroUMLRoassalBuilder >> attachPointFromTopOf: aRSShape to: anotherRSShape [
 ]
 
 { #category : 'accessing' }
+MicroUMLRoassalBuilder >> classDiagramNode [
+
+	^ classDiagramNode
+]
+
+{ #category : 'accessing' }
+MicroUMLRoassalBuilder >> classDiagramNode: aMicroUMLClassDiagramNode [
+
+	classDiagramNode := aMicroUMLClassDiagramNode
+]
+
+{ #category : 'accessing' }
 MicroUMLRoassalBuilder >> gap [
 
 	^ 100
@@ -130,13 +128,6 @@ MicroUMLRoassalBuilder >> gap [
 MicroUMLRoassalBuilder >> horizontalGap [
 
 	^ 80
-]
-
-{ #category : 'initialization' }
-MicroUMLRoassalBuilder >> initialize [
-
-	super initialize.
-	associationEdges := OrderedCollection new
 ]
 
 { #category : 'testing' }
@@ -347,27 +338,6 @@ MicroUMLRoassalBuilder >> newMemberLabelFor: aMicroUMLMemberNode [
 	^ label
 ]
 
-{ #category : 'building' }
-MicroUMLRoassalBuilder >> objects [
-
-	^ Array streamContents: [ :stream |
-			  | nodes |
-			  nodes := Dictionary new.
-			  astBuilder classesDo: [ :classAst |
-					  | node |
-					  node := self newClassBoxFor: classAst.
-					  nodes at: classAst name put: node.
-					  stream nextPut: node ].
-			  astBuilder classesDo: [ :classAst |
-					  classAst superclass ifNotNil: [ :superclassName |
-							  | link |
-							  link := self
-								          newInheritanceLinkBetween: (nodes at: classAst name)
-								          andSuperclass: (nodes at: superclassName).
-							  stream nextPut: link ] ].
-			  RSTreeLayout on: nodes values asArray ]
-]
-
 { #category : 'rendering' }
 MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherRSShape in: aRSCanvas [
 
@@ -491,14 +461,14 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 	edges := OrderedCollection new.
 	connectedNodes := IdentitySet new.
 	extraEdges := OrderedCollection new.
-	astBuilder classesDo: [ :classAst |
+	classDiagramNode classesDo: [ :classAst |
 			| node |
 			node := self newClassBoxFor: classAst.
 			aRSCanvas
 				add: node;
 				addNode: node.
 			nodes at: classAst name put: node ].
-	astBuilder classesDo: [ :classAst |
+	classDiagramNode classesDo: [ :classAst |
 			classAst superclass ifNotNil: [ :superclassName |
 					| link |
 					link := self
@@ -508,7 +478,7 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 						add: (nodes at: classAst name);
 						add: (nodes at: superclassName).
 					aRSCanvas add: link ] ].
-	astBuilder associationsDo: [ :associationNode |
+	classDiagramNode associationsDo: [ :associationNode |
 			| edge leftNode rightNode |
 			leftNode := nodes at: associationNode leftClass.
 			rightNode := nodes at: associationNode rightClass.

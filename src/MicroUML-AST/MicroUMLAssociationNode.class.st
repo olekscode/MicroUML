@@ -6,7 +6,7 @@ Multiplicity is nil iff no multiplicity is set to the class.
 "
 Class {
 	#name : 'MicroUMLAssociationNode',
-	#superclass : 'Object',
+	#superclass : 'MicroUMLAstNode',
 	#instVars : [
 		'leftClass',
 		'leftHead',
@@ -53,6 +53,32 @@ MicroUMLAssociationNode >> leftLabel [
 MicroUMLAssociationNode >> leftLabel: aStringOrNil [
 
 	leftLabel := aStringOrNil
+]
+
+{ #category : 'printing' }
+MicroUMLAssociationNode >> printMicroUMLOn: aStream [
+
+	| heads |
+	heads := {
+		         (#composition -> '<*>').
+		         (#aggregation -> '<>') } asDictionary.
+	leftClass storeOn: aStream.
+	aStream
+		space;
+		nextPutAll: (heads at: leftHead ifAbsent: [ '' ]).
+	leftLabel ifNotNil: [
+			aStream nextPut: $<.
+			leftLabel storeOn: aStream.
+			aStream nextPut: $> ].
+	aStream nextPutAll: '---'.
+	rightLabel ifNotNil: [
+			aStream nextPut: $<.
+			rightLabel storeOn: aStream.
+			aStream nextPut: $> ].
+	aStream
+		nextPutAll: (heads at: rightHead ifAbsent: [ '' ]);
+		space.
+	rightClass storeOn: aStream
 ]
 
 { #category : 'accessing' }
