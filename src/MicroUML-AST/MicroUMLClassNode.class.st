@@ -10,8 +10,10 @@ Class {
 	#instVars : [
 		'name',
 		'superclass',
+		'traits',
 		'members',
-		'isAbstract'
+		'isAbstract',
+		'isTrait'
 	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
@@ -51,46 +53,10 @@ MicroUMLClassNode >> addMethod: aSymbolOrNil [
 			   isMethod: true)
 ]
 
-{ #category : 'converting' }
-MicroUMLClassNode >> asRSShape [
+{ #category : 'adding' }
+MicroUMLClassNode >> addTrait: aSymbol [
 
-	| myLabel attributeShapes methodShapes memberShapes rect y1 y2 box |
-	myLabel := RSLabel text: name model: self.
-	attributeShapes := self attributesCollect: #asRSShape.
-	RSVerticalLineLayout new alignLeft on: attributeShapes.
-	attributeShapes := attributeShapes asShape.
-	methodShapes := self methodsCollect: #asRSShape.
-	RSVerticalLineLayout new alignLeft on: methodShapes.
-	methodShapes := methodShapes asShape.
-	RSVerticalLineLayout new alignLeft on: {
-			attributeShapes.
-			methodShapes }.
-	memberShapes := {
-		                attributeShapes.
-		                methodShapes } asShape.
-	RSVerticalLineLayout new alignCenter on: {
-			myLabel.
-			memberShapes }.
-	rect := {
-		        myLabel.
-		        memberShapes } asShape encompassingRectangle.
-	y1 := myLabel encompassingRectangle bottom + 6.
-	y2 := y1 + attributeShapes encompassingRectangle height.
-
-	^ {
-		  (RSBox new
-			   extent: rect extent + (10 @ 6);
-			   color: Color white;
-			   borderColor: Color black;
-			   borderWidth: 1).
-		  (RSLine new
-			   startPoint: rect extent x / -2 - 5 @ y1;
-			   endPoint: rect extent x / 2 + 5 @ y1).
-		  (RSLine new
-			   startPoint: rect extent x / -2 - 5 @ y2;
-			   endPoint: rect extent x / 2 + 5 @ y2).
-		  myLabel.
-		  memberShapes } asShapeFor: self
+	^ traits add: aSymbol
 ]
 
 { #category : 'accessing' }
@@ -128,9 +94,21 @@ MicroUMLClassNode >> beAbstract [
 ]
 
 { #category : 'accessing' }
+MicroUMLClassNode >> beClass [
+
+	isTrait := false
+]
+
+{ #category : 'accessing' }
 MicroUMLClassNode >> beConcrete [
 
 	isAbstract := false
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> beTrait [
+
+	isTrait := true
 ]
 
 { #category : 'accessing' }
@@ -149,8 +127,10 @@ MicroUMLClassNode >> currentMemberName: aSymbol [
 { #category : 'initialization' }
 MicroUMLClassNode >> initialize [
 
+	traits := OrderedCollection new.
 	members := OrderedCollection new.
-	isAbstract := false
+	isAbstract := false.
+	isTrait := false
 ]
 
 { #category : 'testing' }
@@ -167,7 +147,21 @@ MicroUMLClassNode >> isConcrete [
 
 { #category : 'testing' }
 MicroUMLClassNode >> isEmptyDefinition [
-	^ superclass isNil and: [members isEmpty and: [ isAbstract not ]]
+
+	^ superclass isNil and: [ members isEmpty ]
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> keywords [
+
+	^ Array streamContents: [ :stream |
+		  self keywordsDo: [ :keyword | stream nextPut: keyword ] ]
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> keywordsDo: aBlock [
+
+	isTrait ifTrue: [ aBlock value: #trait ]
 ]
 
 { #category : 'accessing' }
@@ -232,14 +226,20 @@ MicroUMLClassNode >> methodsDo: aBlock [
 MicroUMLClassNode >> modifiers [
 
 	^ (Array streamContents: [ :stream |
-		   self isAbstract ifTrue: [ stream nextPut: #abstract ] ])
-		  ifEmpty: [ nil ]
+			   isAbstract ifTrue: [ stream nextPut: #abstract ].
+			   isTrait ifTrue: [ stream nextPut: #trait ] ]) ifEmpty: [ nil ]
 ]
 
 { #category : 'accessing' }
 MicroUMLClassNode >> modifiers: anArrayOfSymbol [
 
-	isAbstract := anArrayOfSymbol includes: #abstract
+	anArrayOfSymbol
+		ifNotNil: [
+				isAbstract := anArrayOfSymbol includes: #abstract.
+				isTrait := anArrayOfSymbol includes: #trait ]
+		ifNil: [
+				isAbstract := false.
+				isTrait := false ]
 ]
 
 { #category : 'accessing' }
@@ -258,15 +258,24 @@ MicroUMLClassNode >> name: aSymbol [
 MicroUMLClassNode >> printMicroUMLOn: aStream [
 
 	self modifiers ifNotNil: [ :modifiers |
-			aStream nextPutAll: '{ '.
+			aStream nextPutAll: '#('.
 			modifiers
-				do: [ :modifier | modifier storeOn: aStream ]
-				separatedBy: [ aStream nextPutAll: ' . ' ].
-			aStream nextPutAll: ' } % ' ].
+				do: [ :modifier | aStream nextPutAll: modifier ]
+				separatedBy: [ aStream space ].
+			aStream nextPutAll: ') % ' ].
 	self name asSymbol storeOn: aStream.
 	self superclass ifNotNil: [ :superclassName |
+			(traits isEmpty and: [ members isEmpty ]) ifFalse: [
+					aStream
+						cr;
+						space ].
 			aStream nextPutAll: ' --|> '.
 			superclassName asSymbol storeOn: aStream ].
+	self traitsDo: [ :traitName |
+			aStream
+				cr;
+				nextPutAll: '  --@ '.
+			traitName asSymbol storeOn: aStream ].
 	self members ifNotEmpty: [
 			aStream cr.
 			self members
@@ -288,4 +297,16 @@ MicroUMLClassNode >> superclass [
 MicroUMLClassNode >> superclass: aSymbol [
 
 	superclass := aSymbol
+]
+
+{ #category : 'accessing' }
+MicroUMLClassNode >> traits [
+
+	^ traits asArray
+]
+
+{ #category : 'enumerating' }
+MicroUMLClassNode >> traitsDo: aBlock [
+
+	traits do: aBlock
 ]

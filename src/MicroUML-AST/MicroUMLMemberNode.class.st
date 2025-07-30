@@ -195,18 +195,18 @@ MicroUMLMemberNode >> printMicroUMLOn: aStream [
 						 at: visibility
 						 ifAbsent: [ '* ' ] ]).
 	self modifiers ifNotNil: [ :symbols |
-			aStream nextPutAll: '{ '.
+			aStream nextPutAll: '#('.
 			symbols
-				do: [ :symbol | symbol storeOn: aStream ]
-				separatedBy: [ aStream nextPutAll: ' . ' ].
-			aStream nextPutAll: ' } % ' ].
+				do: [ :symbol | aStream nextPutAll: symbol ]
+				separatedBy: [ aStream space ].
+			aStream nextPutAll: ') % ' ].
 	self name storeOn: aStream.
 	self argumentTypes ifNotNil: [ :symbols |
-			aStream nextPutAll: '~{ '.
+			aStream nextPutAll: ' ~#('.
 			symbols
-				do: [ :symbol | symbol storeOn: aStream ]
-				separatedBy: [ aStream nextPutAll: ' . ' ].
-			aStream nextPutAll: ' }' ].
+				do: [ :symbol | aStream nextPutAll: symbol ]
+				separatedBy: [ aStream space ].
+			aStream nextPutAll: ')' ].
 	self type ifNotNil: [ :symbol |
 			aStream nextPutAll: ' @ '.
 			symbol storeOn: aStream ]

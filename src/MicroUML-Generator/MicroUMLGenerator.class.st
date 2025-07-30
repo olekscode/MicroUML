@@ -20,6 +20,21 @@ MicroUMLGenerator class >> example [
 		openWithTitle: self name
 ]
 
+{ #category : 'examples' }
+MicroUMLGenerator class >> exampleRoassal [
+
+	(MicroUMLRoassalBuilder new classDiagramNode: (self new
+				  generateClass: ArrayedCollection;
+				  generateClass: Array;
+				  generateClass: Float64Array;
+				  generateClass: IntegerArray;
+				  generateClass: PointArray;
+				  diagram)) build
+		zoomToFit;
+		@ RSCanvasController;
+		openWithTitle: self name
+]
+
 { #category : 'class access' }
 MicroUMLGenerator >> associationNodeClass [
 
@@ -72,20 +87,20 @@ MicroUMLGenerator >> generateAttribute: aSymbol in: aClass [
 { #category : 'generating' }
 MicroUMLGenerator >> generateClass: aClass [
 
-	| classNode |
-	classNode := diagram ensureClassNamed: aClass name asSymbol.
-	aClass superclass ifNotNil: [ :s |
+	| class classNode |
+	class := aClass instanceSide.
+	classNode := diagram ensureClassNamed: class name asSymbol.
+	class superclass ifNotNil: [ :s |
 		classNode superclass: s name asSymbol ].
-	aClass instVarNames do: [ :var |
-		self generateAttribute: var asSymbol in: aClass ].
-	aClass isMeta ifFalse: [
-			aClass class instVarNames do: [ :var |
-				self generateAttribute: var asSymbol in: aClass class ] ].
-	aClass selectors do: [ :selector |
-		self generateMethod: selector asSymbol in: aClass ].
-	aClass isMeta ifFalse: [
-			aClass class selectors do: [ :selector |
-				self generateMethod: selector asSymbol in: aClass class ] ].
+	class traits do: [ :trait | classNode addTrait: trait name ].
+	class instVarNames do: [ :var |
+		self generateAttribute: var asSymbol in: class ].
+	class class instVarNames do: [ :var |
+		self generateAttribute: var asSymbol in: class class ].
+	class selectors do: [ :selector |
+		self generateMethod: selector asSymbol in: class ].
+	class class selectors do: [ :selector |
+		self generateMethod: selector asSymbol in: class class ].
 	^ classNode
 ]
 

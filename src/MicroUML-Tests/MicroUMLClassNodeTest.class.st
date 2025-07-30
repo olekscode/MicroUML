@@ -25,6 +25,14 @@ MicroUMLClassNodeTest >> testAddMember [
 ]
 
 { #category : 'tests' }
+MicroUMLClassNodeTest >> testAddTrait [
+
+	class addTrait: #TFoo.
+	class addTrait: #TBar.
+	self assert: class traits equals: { #TFoo. #TBar }
+]
+
+{ #category : 'tests' }
 MicroUMLClassNodeTest >> testAttributeAt [
 
 	| foo |
@@ -83,12 +91,29 @@ MicroUMLClassNodeTest >> testBeAbstract [
 ]
 
 { #category : 'tests' }
+MicroUMLClassNodeTest >> testBeClass [
+
+	class beTrait.
+	self assert: (class keywords includes: #trait).
+	class beClass.
+	self deny: (class keywords includes: #trait)
+]
+
+{ #category : 'tests' }
 MicroUMLClassNodeTest >> testBeConcrete [
 
 	class beAbstract.
 	self deny: class isConcrete.
 	class beConcrete.
 	self assert: class isConcrete
+]
+
+{ #category : 'tests' }
+MicroUMLClassNodeTest >> testBeTrait [
+
+	self deny: (class keywords includes: #trait).
+	class beTrait.
+	self assert: (class keywords includes: #trait)
 ]
 
 { #category : 'tests' }
@@ -110,6 +135,14 @@ MicroUMLClassNodeTest >> testCurrentMemberName [
 	self assert: class currentMember identicalTo: foo.
 	class currentMemberName: #foo.
 	self assert: (class memberAt: #foo) identicalTo: foo
+]
+
+{ #category : 'tests' }
+MicroUMLClassNodeTest >> testKeywords [
+
+	self deny: (class keywords includes: #trait).
+	class beTrait.
+	self assert: (class keywords includes: #trait)
 ]
 
 { #category : 'tests' }
@@ -236,20 +269,22 @@ MicroUMLClassNodeTest >> testPrintMicroUMLOn [
 		assert:
 		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
 		equals: '#Foo --|> #Bar'.
-	class := { #abstract } % #Foo --|> #Bar classAt: #Foo.
+	class := #(abstract) % #Foo --|> #Bar classAt: #Foo.
 	self
 		assert:
 		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '{ #abstract } % #Foo --|> #Bar'.
+		equals: '#(abstract) % #Foo --|> #Bar'.
 	class := 
-	#Foo --|> #Bar
+	#Foo
+		--@ #TBar 
 		* #baz
 		>> #quuux
 	classAt: #Foo.
 	self
 		assert:
 		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#Foo --|> #Bar
+		equals: '#Foo
+  --@ #TBar
   * #baz
   >> #quuux'.
 

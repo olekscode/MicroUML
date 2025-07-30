@@ -54,6 +54,13 @@ MicroUMLAstBuilderTest >> testAddSuperclass [
 ]
 
 { #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddTrait [
+
+	builder === #Foo + #attribute addTrait: #Bar.
+	self assert: builder currentClass traits equals: { #Bar }
+]
+
+{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testAssociations [
 
 	builder === 

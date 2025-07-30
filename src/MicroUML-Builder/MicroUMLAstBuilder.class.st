@@ -176,6 +176,12 @@ MicroUMLAstBuilder >> ---<> aClassOrSymbol [
 ]
 
 { #category : 'UML - inheritance' }
+MicroUMLAstBuilder >> --@ aSymbolOrClass [
+
+	self addTrait: (self getSymbol: aSymbolOrClass)
+]
+
+{ #category : 'UML - inheritance' }
 MicroUMLAstBuilder >> --|> aSymbolOrClass [
 
 	self addSuperclass: (self getSymbol: aSymbolOrClass)
@@ -405,6 +411,12 @@ MicroUMLAstBuilder >> addSubclass: aSymbol [
 MicroUMLAstBuilder >> addSuperclass: aSymbol [
 
 	currentClass superclass: aSymbol
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addTrait: aSymbol [
+
+	currentClass addTrait: aSymbol
 ]
 
 { #category : 'class access' }

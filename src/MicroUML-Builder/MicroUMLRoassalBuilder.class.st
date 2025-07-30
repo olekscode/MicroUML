@@ -20,7 +20,47 @@ MicroUMLRoassalBuilder class >> exampleSerie [
 #(abstract) % #AbstractSeries 
 	+ #name @ String 
 	- #(abstract) % #numEpisodes @ Integer
-	+ #(static) % #findByName ~ {#String} @ #AbstractSeries
+	+ #(static) % #findByName ~#(String) @ #AbstractSeries
+=== 
+#NovelSeries 
+	--|> #AbstractSeries
+	+ #author @ String 
+	* #Publisher @ String 
+	+ #read~{}
+=== 
+#ComicSeries 
+	--|> #AbstractSeries 
+	+ #toonAuthor @ String
+	* #storyAuthor @ String 
+	+ #print~{} 
+=== 
+#AnimeSeries
+	--|> #AbstractSeries 
+	+ #director @ String 
+	- #animators @ String
+	- #voiceActors @ String 
+	+ #play~{} 
+	<><'original'>---<'comicalize'> #ComicSeries 
+	<><'main'>---<'side stories'> #NovelSeries .
+	builder := MicroUMLRoassalBuilder new
+		           classDiagramNode: uml diagram;
+		           build.
+	builder
+		@ RSCanvasController;
+		open
+]
+
+{ #category : 'examples' }
+MicroUMLRoassalBuilder class >> exampleSerie2 [
+
+	| uml builder |
+	uml := 
+#(abstract) % #AbstractSeries 
+   --@ #TSearch
+	--@ #TArtifact
+	+ #name @ String 
+	- #(abstract) % #numEpisodes @ Integer
+	+ #(static) % #findByName ~#(String) @ #AbstractSeries
 === 
 #NovelSeries 
 	--|> #AbstractSeries
@@ -106,6 +146,14 @@ MicroUMLRoassalBuilder >> attachPointFromTopOf: aRSShape to: anotherRSShape [
 	^ rect topCenter + (theta / Float pi * rect width / 2.0 @ 0)
 ]
 
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> canOccupy: aRectangle ifTrue: aBlock [
+
+	(self canvas shapes anySatisfy: [ :shape |
+		 shape encompassingRectangle intersects: aRectangle ]) ifFalse:
+		aBlock
+]
+
 { #category : 'accessing' }
 MicroUMLRoassalBuilder >> classDiagramNode [
 
@@ -186,11 +234,22 @@ MicroUMLRoassalBuilder >> isTopmostShape: aRSShape in: aCollectionOfRSShape [
 MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 
 	| myLabel attributeShapes methodShapes memberShapes rect y1 y2 |
-	myLabel := RSLabel
-		           text: aMicroUMLClassNode name
-		           model: aMicroUMLClassNode.
-	aMicroUMLClassNode isAbstract ifTrue: [
-		myLabel emphasis: TextEmphasis italic ].
+	myLabel := Array streamContents: [ :stream |
+			           | label |
+			           aMicroUMLClassNode keywordsDo: [ :keyword |
+					           stream nextPut: (RSLabel new
+							            text: '<<' , keyword , '>>';
+							            color: Color darkGray) ].
+			           label := RSLabel new
+				                    model: aMicroUMLClassNode;
+				                    text: aMicroUMLClassNode name;
+				                    color: Color black.
+			           aMicroUMLClassNode isAbstract ifTrue: [ label italic ].
+			           stream nextPut: label ].
+	RSVerticalLineLayout new
+		alignCenter;
+		on: myLabel.
+	myLabel := myLabel asShape.
 	myLabel extent x < 100 ifTrue: [
 		myLabel extent: 100 @ myLabel extent y ].
 	aMicroUMLClassNode isEmptyDefinition
@@ -198,6 +257,7 @@ MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 				^ {
 					  (RSBox new
 						   extent: myLabel extent + (10 @ 6);
+						   position: myLabel position;
 						   color: Color white;
 						   borderColor: Color black;
 						   borderWidth: 1).
@@ -348,6 +408,18 @@ MicroUMLRoassalBuilder >> newMemberLabelFor: aMicroUMLMemberNode [
 	^ label
 ]
 
+{ #category : 'instance creation' }
+MicroUMLRoassalBuilder >> newTraitLinkBetween: aRSShape andLollipop: anotherRSShape [
+
+	^ RSBezier new
+		  color: Color black;
+		  attachPoint: RSCenteredAttachPoint new;
+		  from: aRSShape;
+		  to: anotherRSShape;
+		  controlPointsController: RSVerticalCPAPController new;
+		  yourself
+]
+
 { #category : 'rendering' }
 MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherRSShape in: aRSCanvas [
 
@@ -466,9 +538,10 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 { #category : 'rendering' }
 MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 
-	| nodes edges connectedNodes extraEdges |
+	| nodes edges lollipops connectedNodes extraEdges |
 	nodes := Dictionary new.
 	edges := OrderedCollection new.
+	lollipops := Dictionary new.
 	connectedNodes := IdentitySet new.
 	extraEdges := OrderedCollection new.
 	classDiagramNode classesDo: [ :classAst |
@@ -477,7 +550,22 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 			aRSCanvas
 				add: node;
 				addNode: node.
-			nodes at: classAst name put: node ].
+			nodes at: classAst name put: node.
+			classAst traitsDo: [ :traitName |
+					| lollipop |
+					lollipop := RSCircle new
+						            extent: 20 @ 20;
+						            color: Color white;
+						            border: (RSBorder new color: Color black);
+						            yourself.
+					aRSCanvas
+						add: lollipop;
+						addNode: lollipop.
+					lollipops
+						at: {
+								node.
+								traitName }
+						put: lollipop ] ].
 	classDiagramNode classesDo: [ :classAst |
 			classAst superclass ifNotNil: [ :superclassName |
 					(nodes includesKey: superclassName) ifTrue: [
@@ -489,6 +577,13 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 								add: (nodes at: classAst name);
 								add: (nodes at: superclassName).
 							aRSCanvas add: link ] ] ].
+	lollipops keysAndValuesDo: [ :classNodeAndTraitName :lollipop |
+			| link |
+			link := self
+				        newTraitLinkBetween: classNodeAndTraitName first
+				        andLollipop: lollipop.
+			aRSCanvas add: link.
+			link pushBack ].
 	classDiagramNode associationsDo: [ :associationNode |
 			| edge leftNode rightNode |
 			leftNode := nodes at: associationNode leftClass.
@@ -510,7 +605,7 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 	RSTreeLayout new
 		verticalGap: self verticalGap;
 		horizontalGap: self horizontalGap;
-		on: (nodes values as: RSGroup).
+		on: (nodes values , lollipops values as: RSGroup).
 	extraEdges do: [ :edge |
 			| leftNode rightNode |
 			leftNode := nodes at: edge model leftClass.
@@ -521,6 +616,12 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 				to: rightNode
 				in: aRSCanvas ].
 	edges do: [ :bezier | self renderLinkLabelsFor: bezier in: aRSCanvas ].
+	lollipops keysAndValuesDo: [ :classNodeAndTraitName :lollipop |
+			self
+				renderTraitLabelAt: lollipop
+				classNode: classNodeAndTraitName first
+				traitName: classNodeAndTraitName second
+				in: aRSCanvas ].
 	aRSCanvas zoomToFit
 ]
 
@@ -592,6 +693,25 @@ MicroUMLRoassalBuilder >> renderLinkLabelsFor: aRSBezier in: aRSCanvas [
 								+
 								(label textWidth / 2 + 6
 								 @ (label textHeight / -2 - 6 - markerOffset)) ] ] ]
+]
+
+{ #category : 'rendering' }
+MicroUMLRoassalBuilder >> renderTraitLabelAt: aRSShape classNode: anotherRSShape traitName: aSymbol in: aRSCanvas [
+
+	| label extent |
+	label := RSLabel new
+		         text: aSymbol asString;
+		         color: Color black;
+		         yourself.
+	extent := label extent.
+	anotherRSShape position y < aRSShape position y
+		ifTrue: [
+				label position:
+					aRSShape encompassingRectangle bottomCenter + (0 @ extent y) ]
+		ifFalse: [
+				label position:
+					aRSShape encompassingRectangle topCenter - (0 @ extent y) ].
+	aRSCanvas add: label
 ]
 
 { #category : 'accessing' }
