@@ -493,7 +493,9 @@ MicroUMLAstBuilder >> extent: aPoint [
 
 	| canvas |
 	canvas := self newRoassalBuilder build.
-	aPoint isPoint ifTrue: [ canvas extent: aPoint ].
+	canvas extent: (aPoint isPoint
+			 ifTrue: [ aPoint ]
+			 ifFalse: [ canvas encompassingRectangle extent ]).
 	canvas zoomToFit.
 	^ canvas asForm
 ]
