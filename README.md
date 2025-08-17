@@ -21,11 +21,11 @@ MicroUML has been designed during ESUG 2025 at Gdansk with the following constra
 #### Class definition
 Class definition starts with `#` and conceptually produces a UmlClassBox
 
-```
+```st
 #AbstractSeries 
 ```
 
-```
+```st
 #AbstractSeries
     --|> #Manga
 ```
@@ -34,7 +34,7 @@ Class definition starts with `#` and conceptually produces a UmlClassBox
 
 The message `-`, `+`, `*` are used to add members to a UmlClassBox
 
-```
+```st
 #AbstractSeries
     - #read~{}
     >+ #printOn:~{s @Stream}
@@ -42,7 +42,7 @@ The message `-`, `+`, `*` are used to add members to a UmlClassBox
 
 #### Class variable and class methods
 
-```
+```st
 #AbstractSeries
     $ ClassVar @ #Float
     >+ #(static) % #findByName ~ {#String} @ #AbstractSeries
@@ -53,7 +53,7 @@ The message `-`, `+`, `*` are used to add members to a UmlClassBox
 - ` --|> ` defines subclass
 - ` ---<'comicalize'> ` composition
 
-```
+```st
 #AnimeSeries
     --|> #AbstractSeries 
     <'original'>---<'comicalize'> #ComicSeries 
@@ -64,7 +64,7 @@ The message `-`, `+`, `*` are used to add members to a UmlClassBox
 
 We use `===` to link multiple class definitions. 
 
-```pharoscript
+```st
 #AbstractSeries 
     + #name @ String 
     * #numEpisodes @ Integer
@@ -94,7 +94,7 @@ the following Pharo code snippet.
 
 Here is the Pharo program that creates a metamodel that can be rendered as the previous figure.
 
-```pharoscript
+```st
 #AbstractSeries 
     + #name @ String 
     * #numEpisodes @ Integer
@@ -125,7 +125,7 @@ Here is the Pharo program that creates a metamodel that can be rendered as the p
 
 
 
-```
+```st
 | uml builder |
 uml := 
 #(abstract) % #AbstractSeries 
@@ -166,7 +166,7 @@ uml :=
 Watch out we want to integrate it into Pharo so the repository will probably change.
 
 
-```
+```st
 Metacello new
   baseline: 'MicroUML';
   repository: 'github://olekscode/MicroUML/src';
@@ -175,7 +175,7 @@ Metacello new
 
 ## If you want to depend on it
 
-```
+```st
   spec 
     baseline: 'MicroUML' 
     with: [ spec repository: 'github://olekscode/MicroUML/src' ].
