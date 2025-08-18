@@ -169,7 +169,7 @@ Watch out we want to integrate it into Pharo so the repository will probably cha
 ```st
 Metacello new
   baseline: 'MicroUML';
-  repository: 'github://olekscode/MicroUML/src';
+  repository: 'github://olekscode/MicroUML:main';
   load.
 ```
 
@@ -178,7 +178,7 @@ Metacello new
 ```st
   spec 
     baseline: 'MicroUML' 
-    with: [ spec repository: 'github://olekscode/MicroUML/src' ].
+    with: [ spec repository: 'github://olekscode/MicroUML:main' ].
 ```
 
 
