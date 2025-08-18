@@ -154,7 +154,7 @@ uml :=
     <'original'>---<'comicalize'> #ComicSeries 
     <><'main'>---<'side stories'> #NovelSeries .
     builder := MicroUMLRoassalBuilder new
-                   astBuilder: uml;
+                   classDiagramNode: uml diagram;
                    build.
     builder
         @ RSCanvasController;
