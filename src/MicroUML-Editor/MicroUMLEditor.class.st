@@ -59,7 +59,7 @@ MicroUMLEditor >> drawDiagram [
 	
 	builder classDiagramNode: uml diagram.
 	builder canvas clear.
-	builder build.
+	builder build @ RSCanvasController.
 	builder container signalUpdate
 ]
 
@@ -105,12 +105,20 @@ MicroUMLEditor >> initializeToolbar [
 	liveDrawingButton := self newToolbarToggleButton
 		label: 'Live';
 		icon: (self iconNamed: #autoReload);
-		whenActivatedDo: [ drawButton disable ];
+		whenActivatedDo: [ 
+			self drawDiagram.
+			drawButton disable ];
 		whenDeactivatedDo: [ drawButton enable ];
 		yourself.
 		
 	toolbar add: drawButton.
-	toolbar add: liveDrawingButton
+	toolbar add: liveDrawingButton.
+	
+	toolbar add: (self newToolbarButton
+		label: 'Save PNG';
+		icon: (self iconNamed: #smallScreenshot);
+		action: [ self saveAsPng ];
+		yourself).
 ]
 
 { #category : 'initialization' }
@@ -121,4 +129,16 @@ MicroUMLEditor >> initializeWindow: aWindowPresenter [
 	aWindowPresenter 
 		title: 'MicroUML';
 		initialExtent: 1300@800.
+]
+
+{ #category : 'as yet unclassified' }
+MicroUMLEditor >> saveAsPng [
+
+	(StSaveFilePresenter extensions: {'png'})
+		okAction: [ :fileReference | 
+			RSPNGExporter new
+				canvas: preview canvas;
+				exportToFile: fileReference ]
+
+	
 ]
