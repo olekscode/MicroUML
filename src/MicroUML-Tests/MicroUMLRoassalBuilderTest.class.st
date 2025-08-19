@@ -16,6 +16,19 @@ MicroUMLRoassalBuilderTest >> setUp [
 ]
 
 { #category : 'tests' }
+MicroUMLRoassalBuilderTest >> testEmpty [
+
+	| uml canvas |
+	uml := MicroUMLAstBuilder new.
+	
+	canvas := MicroUMLRoassalBuilder new 
+		classDiagramNode: uml diagram;
+		build.
+		
+	self assert: canvas shapes isEmpty
+]
+
+{ #category : 'tests' }
 MicroUMLRoassalBuilderTest >> testOneClass [
 
 	| uml canvas shape node |
