@@ -18,6 +18,12 @@ MicroUMLEditor class >> example [
 	self new open
 ]
 
+{ #category : 'compiling' }
+MicroUMLEditor >> compileUml [
+
+	^ Smalltalk compiler evaluate: code text
+]
+
 { #category : 'initialization' }
 MicroUMLEditor >> connectPresenters [
 
@@ -55,7 +61,7 @@ MicroUMLEditor >> drawDiagram [
 	
 	uml := code text trimmed
 		ifEmpty: [ MicroUMLAstBuilder new ]
-		ifNotEmpty: [ Smalltalk compiler evaluate: code text ].
+		ifNotEmpty: [ self compileUml ].
 	
 	builder classDiagramNode: uml diagram.
 	builder canvas clear.
@@ -119,6 +125,11 @@ MicroUMLEditor >> initializeToolbar [
 		icon: (self iconNamed: #smallScreenshot);
 		action: [ self saveAsPng ];
 		yourself).
+		
+	toolbar add: (self newToolbarButton
+		label: 'Inspect';
+		icon: (self iconNamed: #inspect);
+		action: [ self compileUml inspect ])
 ]
 
 { #category : 'initialization' }
