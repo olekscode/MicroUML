@@ -90,68 +90,36 @@ MicroUMLRoassalBuilder class >> exampleSerie2 [
 		open
 ]
 
-{ #category : 'private' }
-MicroUMLRoassalBuilder >> attachPointFromBottomOf: aRSShape to: anotherRSShape [
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> attachPointFromBottomOf: aRectangle to: anotherRectangle [
 
-	| theta rect |
-	theta := ((GLine
-		           through: aRSShape encompassingRectangle center
-		           and: anotherRSShape encompassingRectangle center)
-		          angleWith: (GLine through: 0 @ 0 and: 0 @ 1))
-	         \\ (Float pi * 2).
-	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
-	rect := aRSShape encompassingRectangle.
-	^ rect bottomCenter + (theta / Float pi * rect width / 2.0 @ 0)
+	| theta |
+	theta := (anotherRectangle center - aRectangle center) theta.
+	^ aRectangle bottomCenter + (aRectangle width * 0.3 * theta cos @ 0)
 ]
 
-{ #category : 'private' }
-MicroUMLRoassalBuilder >> attachPointFromLeftOf: aRSShape to: anotherRSShape [
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> attachPointFromLeftOf: aRectangle to: anotherRectangle [
 
-	| theta rect |
-	theta := ((GLine
-		           through: aRSShape encompassingRectangle center
-		           and: anotherRSShape encompassingRectangle center)
-		          angleWith: (GLine through: 1 @ 0 and: 0 @ 0))
-	         \\ (Float pi * 2).
-	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
-	rect := aRSShape encompassingRectangle.
-	^ rect leftCenter + (0 @ (theta / Float pi * rect height / 2.0))
+	| theta |
+	theta := (anotherRectangle center - aRectangle center) theta.
+	^ aRectangle leftCenter + (0 @ (aRectangle height * 0.3 * theta sin))
 ]
 
-{ #category : 'private' }
-MicroUMLRoassalBuilder >> attachPointFromRightOf: aRSShape to: anotherRSShape [
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> attachPointFromRightOf: aRectangle to: anotherRectangle [
 
-	| theta rect |
-	theta := ((GLine
-		           through: aRSShape encompassingRectangle center
-		           and: anotherRSShape encompassingRectangle center)
-		          angleWith: (GLine through: 1 @ 0 and: 0 @ 0))
-	         \\ (Float pi * 2).
-	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
-	rect := aRSShape encompassingRectangle.
-	^ rect rightCenter + (0 @ (theta / Float pi * rect height / 2.0))
+	| theta |
+	theta := (anotherRectangle center - aRectangle center) theta.
+	^ aRectangle rightCenter + (0 @ (aRectangle width * 0.3 * theta sin))
 ]
 
-{ #category : 'private' }
-MicroUMLRoassalBuilder >> attachPointFromTopOf: aRSShape to: anotherRSShape [
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> attachPointFromTopOf: aRectangle to: anotherRectangle [
 
-	| theta rect |
-	theta := ((GLine
-		           through: aRSShape encompassingRectangle center
-		           and: anotherRSShape encompassingRectangle center)
-		          angleWith: (GLine through: 0 @ 0 and: 0 @ 1))
-	         \\ (Float pi * 2).
-	theta > Float pi ifTrue: [ theta := theta - (Float pi * 2.0) ].
-	rect := aRSShape encompassingRectangle.
-	^ rect topCenter + (theta / Float pi * rect width / 2.0 @ 0)
-]
-
-{ #category : 'private' }
-MicroUMLRoassalBuilder >> canOccupy: aRectangle ifTrue: aBlock [
-
-	(self canvas shapes anySatisfy: [ :shape |
-		 shape encompassingRectangle intersects: aRectangle ]) ifFalse:
-		aBlock
+	| theta |
+	theta := (anotherRectangle center - aRectangle center) theta.
+	^ aRectangle topCenter + (aRectangle width * 0.3 * theta cos @ 0)
 ]
 
 { #category : 'accessing' }
@@ -166,10 +134,42 @@ MicroUMLRoassalBuilder >> classDiagramNode: aMicroUMLClassDiagramNode [
 	classDiagramNode := aMicroUMLClassDiagramNode
 ]
 
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> controlPointsFrom: aRectangle to: anotherRectangle inCanvas: aRSCanvas [
+
+	| geometries leastPenalty bestControlPoints |
+	geometries := self geometriesInCanvas: aRSCanvas.
+	leastPenalty := Float infinity.
+	bestControlPoints := nil.
+	self
+		possibleControlPointsFrom: aRectangle
+		to: anotherRectangle
+		do: [ :cp |
+				| penalty |
+				penalty := self
+					           penaltyAgainstControlPoints: cp
+					           withGeometries: geometries.
+				penalty < leastPenalty ifTrue: [
+						leastPenalty := penalty.
+						bestControlPoints := cp ] ].
+	^ bestControlPoints
+]
+
 { #category : 'accessing' }
 MicroUMLRoassalBuilder >> gap [
 
 	^ 100
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> geometriesInCanvas: aRSCanvas [
+
+	^ aRSCanvas shapes asArray
+		  select: [ :shape | shape isKindOf: RSBoundingShape ]
+		  thenCollect: [ :shape |
+				  | rect |
+				  rect := shape encompassingRectangle.
+				  GRectangle origin: rect origin corner: rect corner ]
 ]
 
 { #category : 'accessing' }
@@ -420,119 +420,326 @@ MicroUMLRoassalBuilder >> newTraitLinkBetween: aRSShape andLollipop: anotherRSSh
 		  yourself
 ]
 
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> offsetForLabel: aRSLabel markerExtent: aPoint directing: anotherPoint to: yetAnotherPoint [
+
+	^ anotherPoint y abs <= anotherPoint x abs
+		  ifTrue: [
+				  aRSLabel width * 0.5 + 2 + aPoint x abs
+				  * (anotherPoint x sign + 0.1) sign @ (aRSLabel height * 0.5 + 2
+				   * (yetAnotherPoint y sign + 0.1) sign negated) ]
+		  ifFalse: [
+				  aRSLabel width * 0.5 + 2
+				  * (yetAnotherPoint x sign + 0.1) sign negated
+				  @ (aRSLabel height * 0.5 + 2 + aPoint y abs
+					   * (anotherPoint y sign + 0.5) sign) ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> penaltyAgainstControlPoints: anArrayOfPoint withGeometries: aCollectionOfGeometry [
+
+	| points lines penalty |
+	points := (RSBezier new controlPoints: anArrayOfPoint) lines.
+	lines := (1 to: points size - 1) collect: [ :i |
+		         GLine through: (points at: i) and: (points at: i + 1) ].
+	penalty := 0.
+	aCollectionOfGeometry do: [ :geometry |
+			(lines anySatisfy: [ :line |
+				 (geometry intersectionsWithLine: line) notEmpty ]) ifTrue: [
+				penalty := penalty + 1 ] ].
+	^ penalty
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFrom: aRectangle to: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromLeft: aRectangle
+		toRight: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromRight: aRectangle
+		toLeft: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromBottom: aRectangle
+		toTop: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromTop: aRectangle
+		toBottom: anotherRectangle
+		do: aBlock.
+
+	self
+		possibleControlPointsFromLeft: aRectangle
+		toLeft: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromRight: aRectangle
+		toRight: anotherRectangle
+		do: aBlock.
+
+	self
+		possibleControlPointsFromRight: aRectangle
+		toBottom: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromBottom: aRectangle
+		toRight: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromBottom: aRectangle
+		toLeft: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromLeft: aRectangle
+		toBottom: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromBottom: aRectangle
+		toBottom: anotherRectangle
+		do: aBlock.
+
+	self
+		possibleControlPointsFromLeft: aRectangle
+		toTop: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromRight: aRectangle
+		toTop: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromTop: aRectangle
+		toRight: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromTop: aRectangle
+		toLeft: anotherRectangle
+		do: aBlock;
+		possibleControlPointsFromTop: aRectangle
+		toTop: anotherRectangle
+		do: aBlock
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toBottom: anotherRectangle do: aBlock [
+
+	| bottom p1 p2 |
+	bottom := (aRectangle bottom max: anotherRectangle bottom)
+	          + self verticalGap.
+	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromBottomOf: anotherRectangle to: aRectangle.
+	(p1 x between: anotherRectangle left and: anotherRectangle right)
+		ifTrue: [ ^ self ].
+	(p2 x between: aRectangle left and: aRectangle right) ifTrue: [
+		^ self ].
+	aBlock value: {
+			p1.
+			(p1 x @ bottom).
+			(p2 x @ bottom).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toLeft: anotherRectangle do: aBlock [
+
+	| p1 p2 |
+	aRectangle bottom <= anotherRectangle center y ifFalse: [ ^ self ].
+	aRectangle center x <= anotherRectangle left ifFalse: [ ^ self ].
+	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromLeftOf: anotherRectangle to: aRectangle.
+	aBlock value: {
+			p1.
+			(p1 x @ p2 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toRight: anotherRectangle do: aBlock [
+
+	| p1 p2 |
+	aRectangle bottom <= anotherRectangle center y ifFalse: [ ^ self ].
+	anotherRectangle right <= aRectangle center x ifFalse: [ ^ self ].
+	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromRightOf: anotherRectangle to: aRectangle.
+	aBlock value: {
+			p1.
+			(p1 x @ p2 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toTop: anotherRectangle do: aBlock [
+
+	| p1 p2 middle |
+	aRectangle bottom < anotherRectangle top ifFalse: [ ^ self ].
+	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
+	middle := p1 y + p2 y / 2.0.
+	aBlock value: {
+			p1.
+			(p1 x @ middle).
+			(p2 x @ middle).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toBottom: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromBottom: anotherRectangle
+		toLeft: aRectangle
+		do: [ :cp | aBlock value: cp reversed ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toLeft: anotherRectangle do: aBlock [
+
+	| left p1 p2 |
+	left := (aRectangle left min: anotherRectangle left)
+	        - self horizontalGap.
+	p1 := self attachPointFromLeftOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromLeftOf: anotherRectangle to: aRectangle.
+	(p1 y between: anotherRectangle top and: anotherRectangle bottom)
+		ifTrue: [ ^ self ].
+	(p2 y between: aRectangle top and: aRectangle bottom) ifTrue: [
+		^ self ].
+	aBlock value: {
+			p1.
+			(left @ p1 y).
+			(left x @ p2 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toRight: anotherRectangle do: aBlock [
+
+	| p1 p2 middle |
+	anotherRectangle right < aRectangle left ifFalse: [ ^ self ].
+	p1 := self attachPointFromLeftOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromRightOf: anotherRectangle to: aRectangle.
+	middle := p1 x + p2 x / 2.0.
+	aBlock value: {
+			p1.
+			(middle @ p1 y).
+			(middle @ p2 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toTop: anotherRectangle do: aBlock [
+
+	| p1 p2 |
+	anotherRectangle center x <= aRectangle left ifFalse: [ ^ self ].
+	aRectangle center y <= anotherRectangle top ifFalse: [ ^ self ].
+	p1 := self attachPointFromLeftOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
+	aBlock value: {
+			p1.
+			(p2 x @ p1 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toBottom: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromBottom: anotherRectangle
+		toRight: aRectangle
+		do: [ :cp | aBlock value: cp reversed ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toLeft: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromLeft: anotherRectangle
+		toRight: aRectangle
+		do: [ :cp | aBlock value: cp reversed ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toRight: anotherRectangle do: aBlock [
+
+	| right p1 p2 |
+	right := (aRectangle right max: anotherRectangle right)
+	         + self horizontalGap.
+	p1 := self attachPointFromRightOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromRightOf: anotherRectangle to: aRectangle.
+	(p1 y between: anotherRectangle top and: anotherRectangle bottom)
+		ifTrue: [ ^ self ].
+	(p2 y between: aRectangle top and: aRectangle bottom) ifTrue: [
+		^ self ].
+	aBlock value: {
+			p1.
+			(right @ p1 y).
+			(right x @ p2 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toTop: anotherRectangle do: aBlock [
+
+	| p1 p2 |
+	aRectangle right <= anotherRectangle center x ifFalse: [ ^ self ].
+	aRectangle center y <= anotherRectangle top ifFalse: [ ^ self ].
+	p1 := self attachPointFromRightOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
+	aBlock value: {
+			p1.
+			(p2 x @ p1 y).
+			p2 }
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromTop: aRectangle toBottom: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromBottom: anotherRectangle
+		toTop: aRectangle
+		do: [ :cp | aBlock value: cp reversed ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromTop: aRectangle toLeft: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromLeft: anotherRectangle
+		toTop: aRectangle
+		do: [ :cp | aBlock value: cp reversed ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromTop: aRectangle toRight: anotherRectangle do: aBlock [
+
+	self
+		possibleControlPointsFromRight: anotherRectangle
+		toTop: aRectangle
+		do: [ :cp | aBlock value: cp reversed ]
+]
+
+{ #category : 'edge layouting' }
+MicroUMLRoassalBuilder >> possibleControlPointsFromTop: aRectangle toTop: anotherRectangle do: aBlock [
+
+	| top p1 p2 |
+	top := (aRectangle top min: anotherRectangle top) - self verticalGap.
+	p1 := self attachPointFromTopOf: aRectangle to: anotherRectangle.
+	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
+	(p1 x between: anotherRectangle left and: anotherRectangle right)
+		ifTrue: [ ^ self ].
+	(p2 x between: aRectangle left and: aRectangle right) ifTrue: [
+		^ self ].
+	aBlock value: {
+			p1.
+			(p1 x @ top).
+			(p2 x @ top).
+			p2 }
+]
+
 { #category : 'rendering' }
 MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherRSShape in: aRSCanvas [
 
-	| margin others others1 others2 |
-	aRSCanvas add: aRSBezier.
-	margin := self horizontalGap max: self verticalGap.
-	others := aRSCanvas nodes copyWithoutAll: {
-			          aRSShape.
-			          anotherRSShape }.
-	others1 := aRSCanvas nodes copyWithout: aRSShape.
-	others2 := aRSCanvas nodes copyWithout: anotherRSShape.
-	((self isRightmostShape: aRSShape in: others1) and: [
-		 self isRightmostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| right point1 point2 |
-			right := (((others select: [ :shape |
-					            shape encompassingRectangle center y
-						            between: (aRSShape encompassingRectangle top min:
-								             anotherRSShape encompassingRectangle top)
-						            and: (aRSShape encompassingRectangle bottom max:
-								             anotherRSShape encompassingRectangle bottom) ])
-				           copyWithAll: {
-						           aRSShape.
-						           anotherRSShape }) collect: [ :shape |
-				          shape encompassingRectangle right ]) max.
-			right := right
-			         + (right - (aRSShape encompassingRectangle right max:
-					           anotherRSShape encompassingRectangle right)) + margin.
-			point1 := self attachPointFromRightOf: aRSShape to: anotherRSShape.
-			point2 := self attachPointFromRightOf: anotherRSShape to: aRSShape.
-			aRSBezier controlPoints: {
-					point1.
-					(right @ point1 y).
-					(right @ point2 y).
-					point2 }.
-			^ self ].
-	((self isLeftmostShape: aRSShape in: others1) and: [
-		 self isLeftmostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| left point1 point2 |
-			left := (((others select: [ :shape |
-					           shape encompassingRectangle center y
-						           between: (aRSShape encompassingRectangle top min:
-								            anotherRSShape encompassingRectangle top)
-						           and: (aRSShape encompassingRectangle bottom max:
-								            anotherRSShape encompassingRectangle bottom) ])
-				          copyWithAll: {
-						          aRSShape.
-						          anotherRSShape }) collect: [ :shape |
-				         shape encompassingRectangle left ]) min.
-			left := left + ((aRSShape encompassingRectangle left min:
-				          anotherRSShape encompassingRectangle left) - left)
-			        - margin.
-			point1 := self attachPointFromLeftOf: aRSShape to: anotherRSShape.
-			point2 := self attachPointFromLeftOf: anotherRSShape to: aRSShape.
-			aRSBezier controlPoints: {
-					point1.
-					(left @ point1 y).
-					(left @ point2 y).
-					point2 }.
-			^ self ].
-	((self isBottommostShape: aRSShape in: others1) and: [
-		 self isBottommostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| bottom point1 point2 |
-			bottom := (((others select: [ :shape |
-					             shape encompassingRectangle center x
-						             between: (aRSShape encompassingRectangle left min:
-								              anotherRSShape encompassingRectangle left)
-						             and: (aRSShape encompassingRectangle right max:
-								              anotherRSShape encompassingRectangle right) ])
-				            copyWithAll: {
-						            aRSShape.
-						            anotherRSShape }) collect: [ :shape |
-				           shape encompassingRectangle bottom ]) max.
-			bottom := bottom
-			          + (bottom - (aRSShape encompassingRectangle bottom max:
-					            anotherRSShape encompassingRectangle bottom))
-			          + margin.
-			point1 := self attachPointFromBottomOf: aRSShape to: anotherRSShape.
-			point2 := self attachPointFromBottomOf: anotherRSShape to: aRSShape.
-			aRSBezier controlPoints: {
-					point1.
-					(point1 x @ bottom).
-					(point2 x @ bottom).
-					point2 }.
-			^ self ].
-	((self isTopmostShape: aRSShape in: others1) and: [
-		 self isTopmostShape: anotherRSShape in: others2 ]) ifTrue: [
-			| top point1 point2 |
-			top := (((others select: [ :shape |
-					          shape encompassingRectangle center x
-						          between: (aRSShape encompassingRectangle left min:
-								           anotherRSShape encompassingRectangle left)
-						          and: (aRSShape encompassingRectangle right max:
-								           anotherRSShape encompassingRectangle right) ])
-				         copyWithAll: {
-						         aRSShape.
-						         anotherRSShape }) collect: [ :shape |
-				        shape encompassingRectangle top ]) min.
-			top := top + ((aRSShape encompassingRectangle top min:
-				         anotherRSShape encompassingRectangle top) - top) - margin.
-			point1 := self attachPointFromTopOf: aRSShape to: anotherRSShape.
-			point2 := self attachPointFromTopOf: anotherRSShape to: aRSShape.
-			aRSBezier controlPoints: {
-					point1.
-					(point1 x @ top).
-					(point2 x @ top).
-					point2 }.
-			^ self ].
-
-	aRSBezier
-		attachPoint: RSBorderAttachPoint new;
-		from: aRSShape;
-		to: anotherRSShape;
-		controlPointsController: RSDirectedBezierCPAPController new
+	(self
+		 controlPointsFrom: aRSShape encompassingRectangle
+		 to: anotherRSShape encompassingRectangle
+		 inCanvas: aRSCanvas)
+		ifNotNil: [ :cp | aRSBezier controlPoints: cp ]
+		ifNil: [
+				aRSBezier
+					attachPoint: RSBorderAttachPoint new;
+					from: aRSShape;
+					to: anotherRSShape;
+					controlPointsController: RSDirectedBezierCPAPController new ].
+	aRSCanvas add: aRSBezier
 ]
 
 { #category : 'rendering' }
@@ -630,69 +837,32 @@ MicroUMLRoassalBuilder >> renderLinkLabelsFor: aRSBezier in: aRSCanvas [
 
 	aRSBezier model ifNotNil: [ :edge |
 			edge leftLabel ifNotNil: [ :text |
-					| label vector markerOffset |
+					| label |
 					label := RSLabel new text: text.
-					aRSCanvas add: label.
-					vector := aRSBezier controlPoints second
-					          - aRSBezier controlPoints first.
-					markerOffset := aRSBezier markerStart
-						                ifNotNil: [ :m |
-								                | extent |
-								                extent := m shape encompassingRectangle extent.
-								                (extent x max: extent y) / 2 ]
-						                ifNil: [ 0 ].
-					vector x >= vector y abs ifTrue: [
-							label position: aRSBezier startPoint
-								+
-								(label textWidth / 2 + 6 + markerOffset
-								 @ (label textHeight / 2 + 6)) ].
-					vector x <= vector y abs negated ifTrue: [
-							label position: aRSBezier startPoint
-								+
-								(label textWidth / -2 - 6 - markerOffset
-								 @ (label textHeight / 2 + 6)) ].
-					vector y > vector x abs ifTrue: [
-							label position: aRSBezier startPoint
-								+
-								(label textWidth / 2 + 6
-								 @ (label textHeight / 2 + 6 + markerOffset)) ].
-					vector y < vector x abs negated ifTrue: [
-							label position: aRSBezier startPoint
-								+
-								(label textWidth / 2 + 6
-								 @ (label textHeight / -2 - 6 - markerOffset)) ] ].
+					label translateTo: aRSBezier controlPoints first + (self
+							 offsetForLabel: label
+							 markerExtent: (aRSBezier markerStart
+									  ifNotNil: [ :m | m shape encompassingRectangle extent ]
+									  ifNil: [ 0 @ 0 ])
+							 directing:
+							 aRSBezier controlPoints second - aRSBezier controlPoints first
+							 to:
+							 aRSBezier controlPoints last - aRSBezier controlPoints first).
+					aRSCanvas add: label ].
 			edge rightLabel ifNotNil: [ :text |
-					| label vector markerOffset |
+					| label |
 					label := RSLabel new text: text.
-					aRSCanvas add: label.
-					vector := aRSBezier controlPoints third
-					          - aRSBezier controlPoints fourth.
-					markerOffset := aRSBezier markerEnd
-						                ifNotNil: [ :m |
-								                | extent |
-								                extent := m shape encompassingRectangle extent.
-								                (extent x max: extent y) / 2 ]
-						                ifNil: [ 0 ].
-					vector x >= vector y abs ifTrue: [
-							label position: aRSBezier endPoint
-								+
-								(label textWidth / 2 + 6 + markerOffset
-								 @ (label textHeight / 2 + 6)) ].
-					vector x <= vector y abs negated ifTrue: [
-							label position: aRSBezier endPoint
-								+
-								(label textWidth / -2 - 6 - markerOffset
-								 @ (label textHeight / 2 + 6)) ].
-					vector y > vector x abs ifTrue: [
-							label position: aRSBezier endPoint
-								+
-								(label textWidth / 2 + 6
-								 @ (label textHeight / 2 + 6 + markerOffset)) ].
-					vector y < vector x abs negated ifTrue: [
-							label position: aRSBezier endPoint
-								+
-								(label textWidth / 2 + 6
-								 @ (label textHeight / -2 - 6 - markerOffset)) ] ] ]
+					label translateTo: aRSBezier controlPoints last + (self
+							 offsetForLabel: label
+							 markerExtent: (aRSBezier markerEnd
+									  ifNotNil: [ :m | m shape encompassingRectangle extent ]
+									  ifNil: [ 0 @ 0 ])
+							 directing:
+							 (aRSBezier controlPoints atLast: 2)
+							 - aRSBezier controlPoints last
+							 to:
+							 aRSBezier controlPoints first - aRSBezier controlPoints last).
+					aRSCanvas add: label ] ]
 ]
 
 { #category : 'rendering' }
