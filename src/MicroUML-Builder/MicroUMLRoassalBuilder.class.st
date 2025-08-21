@@ -596,7 +596,7 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toLeft: anot
 	aBlock value: {
 			p1.
 			(left @ p1 y).
-			(left x @ p2 y).
+			(left @ p2 y).
 			p2 }
 ]
 
@@ -662,7 +662,7 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toRight: an
 	aBlock value: {
 			p1.
 			(right @ p1 y).
-			(right x @ p2 y).
+			(right @ p2 y).
 			p2 }
 ]
 
