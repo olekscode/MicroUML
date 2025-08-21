@@ -111,7 +111,7 @@ MicroUMLRoassalBuilder >> attachPointFromRightOf: aRectangle to: anotherRectangl
 
 	| theta |
 	theta := (anotherRectangle center - aRectangle center) theta.
-	^ aRectangle rightCenter + (0 @ (aRectangle width * 0.3 * theta sin))
+	^ aRectangle rightCenter + (0 @ (aRectangle height * 0.3 * theta sin))
 ]
 
 { #category : 'edge layouting' }
