@@ -54,6 +54,20 @@ MicroUMLClassNode >> addMethod: aSymbolOrNil [
 ]
 
 { #category : 'adding' }
+MicroUMLClassNode >> addModifier: aSymbol [
+
+	| mod |
+	mod := aSymbol asSymbol.
+	mod = #abstract ifTrue: [
+			isAbstract := true.
+			^ aSymbol ].
+	mod = #trait ifTrue: [
+			isTrait := true.
+			^ aSymbol ].
+	^ aSymbol
+]
+
+{ #category : 'adding' }
 MicroUMLClassNode >> addTrait: aSymbol [
 
 	^ traits add: aSymbol
@@ -114,7 +128,7 @@ MicroUMLClassNode >> beTrait [
 { #category : 'accessing' }
 MicroUMLClassNode >> currentMember [
 
-	^ members last
+	^ members ifNotEmpty: #last ifEmpty: [ nil ]
 ]
 
 { #category : 'adding' }
@@ -225,9 +239,9 @@ MicroUMLClassNode >> methodsDo: aBlock [
 { #category : 'accessing' }
 MicroUMLClassNode >> modifiers [
 
-	^ (Array streamContents: [ :stream |
-			   isAbstract ifTrue: [ stream nextPut: #abstract ].
-			   isTrait ifTrue: [ stream nextPut: #trait ] ]) ifEmpty: [ nil ]
+	^ Array streamContents: [ :stream |
+			  isAbstract ifTrue: [ stream nextPut: #abstract ].
+			  isTrait ifTrue: [ stream nextPut: #trait ] ]
 ]
 
 { #category : 'accessing' }
@@ -257,13 +271,12 @@ MicroUMLClassNode >> name: aSymbol [
 { #category : 'printing' }
 MicroUMLClassNode >> printMicroUMLOn: aStream [
 
-	self modifiers ifNotNil: [ :modifiers |
-			aStream nextPutAll: '#('.
-			modifiers
-				do: [ :modifier | aStream nextPutAll: modifier ]
-				separatedBy: [ aStream space ].
-			aStream nextPutAll: ') % ' ].
 	self name asSymbol storeOn: aStream.
+	self modifiers ifNotNil: [ :modifiers |
+			modifiers do: [ :modifier |
+					aStream nextPutAll: ' % '.
+					modifier storeOn: aStream ] ].
+
 	self superclass ifNotNil: [ :superclassName |
 			(traits isEmpty and: [ members isEmpty ]) ifFalse: [
 					aStream

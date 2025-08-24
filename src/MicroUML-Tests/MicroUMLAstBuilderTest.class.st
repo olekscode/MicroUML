@@ -17,7 +17,7 @@ MicroUMLAstBuilderTest >> setUp [
 { #category : 'tests' }
 MicroUMLAstBuilderTest >> testAddClassName [
 
-	builder === #( abstract ) % #Foo.
+	builder === #Foo.
 	self assert: builder currentClass name equals: #Foo
 ]
 
@@ -37,6 +37,22 @@ MicroUMLAstBuilderTest >> testAddMethodArgumentTypes [
 	self
 		assert: (builder currentClass methodAt: #op) argumentTypes
 		equals: #( string uint )
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddModifier [
+
+	self assert: builder currentClass equals: nil.
+	self assert: builder === #Foo % #abstract identicalTo: builder.
+	self assert: builder currentClass name equals: #Foo.
+	self assert: builder currentClass modifiers equals: #( abstract ).
+	self assert: builder currentClass currentMember isNil.
+	builder startMember: #bar.
+	self assert: builder currentClass currentMember name equals: #bar.
+	self assert: builder % #abstract identicalTo: builder.
+	self
+		assert: builder currentClass currentMember modifiers
+		equals: #( abstract )
 ]
 
 { #category : 'tests' }
@@ -154,15 +170,6 @@ MicroUMLAstBuilderTest >> testFinishCurrentClassAndStartNewClass [
 	self assert: builder currentClass name equals: #Foo.
 	self assert: builder === Object identicalTo: builder.
 	self assert: builder currentClass name equals: #Object
-]
-
-{ #category : 'tests' }
-MicroUMLAstBuilderTest >> testFinishCurrentClassAndStartNewClassModifiers [
-
-	self assert: builder currentClass equals: nil.
-	self assert: builder === #( abstract ) identicalTo: builder.
-	self assert: builder currentClass name isNil.
-	self assert: builder currentClass modifiers equals: #( abstract )
 ]
 
 { #category : 'tests' }

@@ -269,25 +269,20 @@ MicroUMLClassNodeTest >> testPrintMicroUMLOn [
 		assert:
 		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
 		equals: '#Foo --|> #Bar'.
-	class := #(abstract) % #Foo --|> #Bar classAt: #Foo.
+	class := MicroUMLAstBuilder === #Foo % #abstract --|> #Bar classAt:
+		         #Foo.
 	self
 		assert:
 		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#(abstract) % #Foo --|> #Bar'.
-	class := 
-	#Foo
-		--@ #TBar 
-		* #baz
-		>> #quuux
-	classAt: #Foo.
+		equals: '#Foo % #abstract --|> #Bar'.
+	class := #Foo --@ #TBar * #baz >> #quuux classAt: #Foo.
 	self
 		assert:
 		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
 		equals: '#Foo
   --@ #TBar
   * #baz
-  >> #quuux'.
-
+  >> #quuux'
 ]
 
 { #category : 'tests' }

@@ -109,11 +109,9 @@ MicroUMLAstBuilder class >> exampleSerie [
 ]
 
 { #category : 'UML - class separators' }
-MicroUMLAstBuilder >> % aSymbolOrClass [
+MicroUMLAstBuilder >> % aSymbol [
 
-	currentClass name isNil
-		ifTrue: [ self addClassName: (self getSymbol: aSymbolOrClass) ]
-		ifFalse: [ self addMemberName: (self getSymbol: aSymbolOrClass) ]
+	self addModifier: aSymbol asSymbol
 ]
 
 { #category : 'UML - attributes and methods' }
@@ -258,13 +256,8 @@ MicroUMLAstBuilder >> <|-- aSymbolOrClass [
 { #category : 'UML - class separators' }
 MicroUMLAstBuilder >> === aSymbolOrClassOrArray [
 
-	aSymbolOrClassOrArray isArray
-		ifTrue: [
-				self finishCurrentClassAndStartNewClassModifiers:
-					aSymbolOrClassOrArray ]
-		ifFalse: [
-				self finishCurrentClassAndStartNewClass:
-					(self getSymbol: aSymbolOrClassOrArray) ]
+	self finishCurrentClassAndStartNewClass:
+		(self getSymbol: aSymbolOrClassOrArray)
 ]
 
 { #category : 'UML - associations' }
@@ -399,6 +392,14 @@ MicroUMLAstBuilder >> addMemberType: aSymbol [
 MicroUMLAstBuilder >> addMethodArgumentTypes: anArrayOfSymbol [
 
 	currentClass currentMember argumentTypes: anArrayOfSymbol
+]
+
+{ #category : 'building' }
+MicroUMLAstBuilder >> addModifier: aSymbol [
+
+	currentClass currentMember
+		ifNotNil: [ :member | member addModifier: aSymbol asSymbol ]
+		ifNil: [ currentClass addModifier: aSymbol asSymbol ]
 ]
 
 { #category : 'building' }

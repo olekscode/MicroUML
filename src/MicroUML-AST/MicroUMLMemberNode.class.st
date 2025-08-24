@@ -19,6 +19,20 @@ Class {
 	#package : 'MicroUML-AST'
 }
 
+{ #category : 'adding' }
+MicroUMLMemberNode >> addModifier: aSymbol [
+
+	| mod |
+	mod := aSymbol asSymbol.
+	mod = #abstract ifTrue: [
+			isAbstract := true.
+			^ aSymbol ].
+	mod = #static ifTrue: [
+			isClassSide := true.
+			^ aSymbol ].
+	^ aSymbol
+]
+
 { #category : 'accessing' }
 MicroUMLMemberNode >> argumentTypes [
 
@@ -152,10 +166,8 @@ MicroUMLMemberNode >> isPublic [
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers [
 
-	^ (Array streamContents: [ :stream |
-			   self isAbstract ifTrue: [ stream nextPut: #abstract ].
-			   self isClassSide ifTrue: [ stream nextPut: #static ] ])
-		  ifEmpty: [ nil ]
+	^ Array streamContents: [ :stream |
+		  self isAbstract ifTrue: [ stream nextPut: #abstract ] ]
 ]
 
 { #category : 'accessing' }
@@ -194,12 +206,6 @@ MicroUMLMemberNode >> printMicroUMLOn: aStream [
 						 (#private -> '- ') } asDictionary
 						 at: visibility
 						 ifAbsent: [ '* ' ] ]).
-	self modifiers ifNotNil: [ :symbols |
-			aStream nextPutAll: '#('.
-			symbols
-				do: [ :symbol | aStream nextPutAll: symbol ]
-				separatedBy: [ aStream space ].
-			aStream nextPutAll: ') % ' ].
 	self name storeOn: aStream.
 	self argumentTypes ifNotNil: [ :symbols |
 			aStream nextPutAll: ' ~#('.
@@ -209,7 +215,11 @@ MicroUMLMemberNode >> printMicroUMLOn: aStream [
 			aStream nextPutAll: ')' ].
 	self type ifNotNil: [ :symbol |
 			aStream nextPutAll: ' @ '.
-			symbol storeOn: aStream ]
+			symbol storeOn: aStream ].
+	self modifiers ifNotNil: [ :symbols |
+			symbols do: [ :symbol |
+					aStream nextPutAll: ' % '.
+					symbol storeOn: aStream ] ]
 ]
 
 { #category : 'accessing' }

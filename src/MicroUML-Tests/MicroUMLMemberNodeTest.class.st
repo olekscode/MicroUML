@@ -117,12 +117,7 @@ MicroUMLMemberNodeTest >> testModifiers [
 	self deny: member isAbstract.
 	member modifiers: #( abstract ).
 	self assert: member isAbstract.
-	self assert: member modifiers equals: #( abstract ).
-	self deny: member isClassSide.
-	member modifiers: #( static ).
-	self deny: member isAbstract.
-	self assert: member isClassSide.
-	self assert: member modifiers equals: #( static )
+	self assert: member modifiers equals: #( abstract )
 ]
 
 { #category : 'tests' }
@@ -140,17 +135,18 @@ MicroUMLMemberNodeTest >> testPrintMicroUMLOn [
 		assert:
 		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
 		equals: '* #foo'.
-	member := (#Quuux + #(abstract static) % #foo @ #Bar classAt: #Quuux) memberAt: #foo.
+	member := (#Quuux + #foo % #abstract @ #Bar classAt: #Quuux)
+		          memberAt: #foo.
 	self
 		assert:
 		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '+ #(abstract static) % #foo @ #Bar'.
-	member := (#Quuux >- #(abstract #static) % #foo ~#(Bar) @ #Baz classAt: #Quuux) memberAt: #foo.
+		equals: '+ #foo @ #Bar % #abstract'.
+	member := (#Quuux >- #foo ~ #( Bar ) @ #Baz % #abstract classAt:
+		           #Quuux) memberAt: #foo.
 	self
 		assert:
 		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '>- #(abstract static) % #foo ~#(Bar) @ #Baz'.
-
+		equals: '>- #foo ~#(Bar) @ #Baz % #abstract'
 ]
 
 { #category : 'tests' }
