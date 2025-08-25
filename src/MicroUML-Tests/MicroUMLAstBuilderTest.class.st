@@ -97,16 +97,17 @@ MicroUMLAstBuilderTest >> testAssociations [
 
 	builder === 
 	#Foo 
-		--- #Bar 
-		<>--- #Baz 
-		<*>--- #Quuux
-		---<> #Zeta
-		---<*> #TurnA.
+		-- #Bar 
+		<>-- #Baz 
+		*-- #Quuux
+		--> #Zeta
+		*=> #TurnA.
 	self assert: builder associations size = 5.
 	self assert: (builder associations collect: #leftClass) equals: #(Foo Foo Foo Foo Foo).
 	self assert: (builder associations collect: #rightClass) equals: #(Bar Baz Quuux Zeta TurnA).
-	self assert: (builder associations collect: #leftHead) equals: #(nil aggregation composition nil nil).
-	self assert: (builder associations collect: #rightHead) equals: #(nil nil nil aggregation composition).
+	self assert: (builder associations collect: #leftHead) equals: #(nil aggregation composition nil composition).
+	self assert: (builder associations collect: #rightHead) equals: #(nil nil nil wedge wedge).
+	self assert: (builder associations collect: #line) equals: #(solid solid solid dashed solid).
 ]
 
 { #category : 'tests' }
@@ -143,54 +144,30 @@ builder :=
 ]
 
 { #category : 'tests' }
-MicroUMLAstBuilderTest >> testFinishCurrentClassAndStartNewClass [
-
-	self assert: builder currentClass equals: nil.
-	self assert: builder === #Foo identicalTo: builder.
-	self assert: builder currentClass name equals: #Foo.
-	self assert: builder === Object identicalTo: builder.
-	self assert: builder currentClass name equals: #Object
-]
-
-{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testStartAttribute [
 
 	builder === #Foo.
-	self assert: (builder startAttribute: #bar) identicalTo: builder.
+	builder startAttribute: #bar.
 	self assert: builder currentClass currentMember name equals: #bar.
 	self assert: builder currentClass currentMember isAttribute.
 	self assert: builder currentClass currentMember isInstanceSide
 ]
 
 { #category : 'tests' }
-MicroUMLAstBuilderTest >> testStartClassSideAttribute [
+MicroUMLAstBuilderTest >> testStartClass [
 
-	builder === #Foo.
-	self
-		assert: (builder startClassSideAttribute: #bar)
-		identicalTo: builder.
-	self assert: builder currentClass currentMember name equals: #bar.
-	self assert: builder currentClass currentMember isAttribute.
-	self assert: builder currentClass currentMember isClassSide
-]
-
-{ #category : 'tests' }
-MicroUMLAstBuilderTest >> testStartClassSideMethod [
-
-	builder === #Foo.
-	self
-		assert: (builder startClassSideMethod: #bar)
-		identicalTo: builder.
-	self assert: builder currentClass currentMember name equals: #bar.
-	self assert: builder currentClass currentMember isMethod.
-	self assert: builder currentClass currentMember isClassSide
+	self assert: builder currentClass equals: nil.
+	builder startClass: #Foo.
+	self assert: builder currentClass name equals: #Foo.
+	self assert: builder === Object identicalTo: builder.
+	self assert: builder currentClass name equals: #Object
 ]
 
 { #category : 'tests' }
 MicroUMLAstBuilderTest >> testStartMethod [
 
 	builder === #Foo.
-	self assert: (builder startMethod: #bar) identicalTo: builder.
+	builder startMethod: #bar.
 	self assert: builder currentClass currentMember name equals: #bar.
 	self assert: builder currentClass currentMember isMethod.
 	self assert: builder currentClass currentMember isInstanceSide

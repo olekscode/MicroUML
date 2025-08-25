@@ -15,16 +15,6 @@ MicroUMLClassNodeTest >> setUp [
 ]
 
 { #category : 'tests' }
-MicroUMLClassNodeTest >> testAddMember [
-
-	| foo |
-	foo := class addMember: #foo.
-	self assert: foo class equals: MicroUMLMemberNode.
-	self assert: class members size equals: 1.
-	self assert: (class memberAt: #foo) identicalTo: foo
-]
-
-{ #category : 'tests' }
 MicroUMLClassNodeTest >> testAddTrait [
 
 	class addTrait: #TFoo.
@@ -36,32 +26,27 @@ MicroUMLClassNodeTest >> testAddTrait [
 MicroUMLClassNodeTest >> testAttributeAt [
 
 	| foo |
-	foo := class addMember: #foo.
-	self assert: (class attributeAt: #foo) identicalTo: foo.
-	foo argumentTypes: #(  ).
-	self assert: (class attributeAt: #foo) isNil
+	foo := class addAttribute: #foo.
+	self assert: (class memberAt: #foo) identicalTo: foo
 ]
 
 { #category : 'tests' }
 MicroUMLClassNodeTest >> testAttributes [
 
 	| foo |
-	foo := class addMember: #foo.
-	self assert: class attributes equals: { foo }.
-	foo argumentTypes: #(  ).
-	self assert: class attributes isEmpty
+	foo := class addAttribute: #foo.
+	class addMethod: #bar.
+	self assert: class attributes equals: { foo }
 ]
 
 { #category : 'tests' }
 MicroUMLClassNodeTest >> testAttributesCollect [
 
 	| foo bar baz quuux |
-	foo := class addMember: #foo.
-	bar := class addMember: #bar.
-	baz := class addMember: #baz.
-	quuux := class addMember: #quuux.
-	bar argumentTypes: #(  ).
-	baz argumentTypes: #( int ).
+	foo := class addAttribute: #foo.
+	bar := class addMethod: #bar.
+	baz := class addMethod: #baz.
+	quuux := class addAttribute: #quuux.
 	self assert: (class attributesCollect: #name) equals: #( foo quuux )
 ]
 
@@ -69,12 +54,10 @@ MicroUMLClassNodeTest >> testAttributesCollect [
 MicroUMLClassNodeTest >> testAttributesDo [
 
 	| foo bar baz quuux |
-	foo := class addMember: #foo.
-	bar := class addMember: #bar.
-	baz := class addMember: #baz.
-	quuux := class addMember: #quuux.
-	bar argumentTypes: #(  ).
-	baz argumentTypes: #( int ).
+	foo := class addAttribute: #foo.
+	bar := class addMethod: #bar.
+	baz := class addMethod: #baz.
+	quuux := class addAttribute: #quuux.
 	self
 		assert: (Array streamContents: [ :stream |
 				 class attributesDo: [ :attribute |
@@ -103,21 +86,11 @@ MicroUMLClassNodeTest >> testBeTrait [
 MicroUMLClassNodeTest >> testCurrentMember [
 
 	| foo bar |
-	foo := class addMember: #foo.
+	foo := class addAttribute: #foo.
 	self assert: class currentMember identicalTo: foo.
-	bar := class addMember: #bar.
+	bar := class addAttribute: #bar.
 	self deny: bar identicalTo: foo.
 	self assert: class currentMember identicalTo: bar
-]
-
-{ #category : 'tests' }
-MicroUMLClassNodeTest >> testCurrentMemberName [
-
-	| foo |
-	foo := class addMember: nil.
-	self assert: class currentMember identicalTo: foo.
-	class currentMemberName: #foo.
-	self assert: (class memberAt: #foo) identicalTo: foo
 ]
 
 { #category : 'tests' }
@@ -131,61 +104,28 @@ MicroUMLClassNodeTest >> testKeywords [
 { #category : 'tests' }
 MicroUMLClassNodeTest >> testMemberAt [
 
-	| foo |
-	foo := class addMember: #foo.
+	| foo bar |
+	foo := class addAttribute: #foo.
 	self assert: (class memberAt: #foo) identicalTo: foo.
-	foo argumentTypes: #(  ).
-	self assert: (class memberAt: #foo) identicalTo: foo
+	bar := class addMethod: #bar.
+	self assert: (class memberAt: #bar) identicalTo: bar
 ]
 
 { #category : 'tests' }
 MicroUMLClassNodeTest >> testMembers [
 
 	| foo |
-	foo := class addMember: #foo.
+	foo := class addMethod: #foo.
 	self assert: class members equals: { foo }.
 	foo argumentTypes: #(  ).
 	self assert: class members equals: { foo }
 ]
 
 { #category : 'tests' }
-MicroUMLClassNodeTest >> testMembersCollect [
-
-	| foo bar baz quuux |
-	foo := class addMember: #foo.
-	bar := class addMember: #bar.
-	baz := class addMember: #baz.
-	quuux := class addMember: #quuux.
-	bar argumentTypes: #(  ).
-	baz argumentTypes: #( int ).
-	self
-		assert: (class membersCollect: #name)
-		equals: #( foo bar baz quuux )
-]
-
-{ #category : 'tests' }
-MicroUMLClassNodeTest >> testMembersDo [
-
-	| foo bar baz quuux |
-	foo := class addMember: #foo.
-	bar := class addMember: #bar.
-	baz := class addMember: #baz.
-	quuux := class addMember: #quuux.
-	bar argumentTypes: #(  ).
-	baz argumentTypes: #( int ).
-	self
-		assert: (Array streamContents: [ :stream |
-				 class membersDo: [ :member | stream nextPut: member name ] ])
-		equals: #( foo bar baz quuux )
-]
-
-{ #category : 'tests' }
 MicroUMLClassNodeTest >> testMethodAt [
 
 	| foo |
-	foo := class addMember: #foo.
-	self assert: (class methodAt: #foo) isNil.
-	foo argumentTypes: #(  ).
+	foo := class addMethod: #foo.
 	self assert: (class methodAt: #foo) identicalTo: foo
 ]
 
@@ -193,9 +133,7 @@ MicroUMLClassNodeTest >> testMethodAt [
 MicroUMLClassNodeTest >> testMethods [
 
 	| foo |
-	foo := class addMember: #foo.
-	self assert: class methods isEmpty.
-	foo argumentTypes: #(  ).
+	foo := class addMethod: #foo.
 	self assert: class methods equals: { foo }
 ]
 
@@ -203,12 +141,10 @@ MicroUMLClassNodeTest >> testMethods [
 MicroUMLClassNodeTest >> testMethodsCollect [
 
 	| foo bar baz quuux |
-	foo := class addMember: #foo.
-	bar := class addMember: #bar.
-	baz := class addMember: #baz.
-	quuux := class addMember: #quuux.
-	bar argumentTypes: #(  ).
-	baz argumentTypes: #( int ).
+	foo := class addAttribute: #foo.
+	bar := class addMethod: #bar.
+	baz := class addMethod: #baz.
+	quuux := class addAttribute: #quuux.
 	self assert: (class methodsCollect: #name) equals: #( bar baz )
 ]
 
@@ -216,12 +152,10 @@ MicroUMLClassNodeTest >> testMethodsCollect [
 MicroUMLClassNodeTest >> testMethodsDo [
 
 	| foo bar baz quuux |
-	foo := class addMember: #foo.
-	bar := class addMember: #bar.
-	baz := class addMember: #baz.
-	quuux := class addMember: #quuux.
-	bar argumentTypes: #(  ).
-	baz argumentTypes: #( int ).
+	foo := class addAttribute: #foo.
+	bar := class addMethod: #bar.
+	baz := class addMethod: #baz.
+	quuux := class addAttribute: #quuux.
 	self
 		assert: (Array streamContents: [ :stream |
 				 class methodsDo: [ :method | stream nextPut: method name ] ])
@@ -244,28 +178,26 @@ MicroUMLClassNodeTest >> testName [
 	self assert: class name equals: #Foo
 ]
 
+{ #category : 'utilities' }
+MicroUMLClassNodeTest >> testPrintMicroUML: aString [
+
+	| association generatedSource1 generatedSource2 |
+	association := (OpalCompiler new evaluate: aString) currentClass.
+	generatedSource1 := association microUMLSource.
+	association := (OpalCompiler new evaluate: aString) currentClass.
+	generatedSource2 := association microUMLSource.
+	self assert: generatedSource2 equals: generatedSource1
+]
+
 { #category : 'tests' }
 MicroUMLClassNodeTest >> testPrintMicroUMLOn [
 
-	class := #Foo --|> #Bar classAt: #Foo.
 	self
-		assert:
-		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#Foo --|> #Bar'.
-	class := MicroUMLAstBuilder === #Foo % #abstract --|> #Bar classAt:
-		         #Foo.
-	self
-		assert:
-		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#Foo % #abstract --|> #Bar'.
-	class := #Foo --@ #TBar * #baz >> #quuux classAt: #Foo.
-	self
-		assert:
-		(String streamContents: [ :stream | class printMicroUMLOn: stream ])
-		equals: '#Foo
-  --@ #TBar
-  * #baz
-  >> #quuux'
+		testPrintMicroUML: 'MicroUMLAstBuilder === #Foo --|> #Bar --@ #TBar - #baz -- #Quuux';
+		testPrintMicroUML: 'MicroUMLAstBuilder === #Foo - #bar > #baz <>-- #Quuux';
+		testPrintMicroUML: 'MicroUMLAstBuilder === #Foo *-- #Quuux';
+		testPrintMicroUML: 'MicroUMLAstBuilder === #Foo --> #Quuux @ ''quuux'''
+
 ]
 
 { #category : 'tests' }

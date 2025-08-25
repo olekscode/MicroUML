@@ -11,19 +11,19 @@ MicroUMLClassDiagramNodeTest >> testPrintMicroUMLWithAssociationsOutsideClassesO
 	diagram := (MicroUMLAstBuilder 
 ===
 #Foo --|> #Bar
-	<>--- #Baz
-	<*>--- #Quuux
+	<>-- #Baz
+	*-- #Quuux
 ===
-#Baz <*>--- #Quuux) diagram.
+#Baz *-- #Quuux) diagram.
 	self assert: (String streamContents: [:stream | diagram printMicroUMLWithAssociationsOutsideClassesOn: stream]) equals: 'MicroUMLAstBuilder
 ===
 #Foo --|> #Bar
 ===
-#Foo <>--- #Baz
+#Foo <>-- #Baz
 ===
-#Foo <*>--- #Quuux
+#Foo *-- #Quuux
 ===
-#Baz <*>--- #Quuux'
+#Baz *-- #Quuux'
 ]
 
 { #category : 'tests' }
@@ -32,15 +32,15 @@ MicroUMLClassDiagramNodeTest >> testPrintMicroUMLWithAssociationsUnderClassesOn 
 	diagram := (MicroUMLAstBuilder 
 ===
 #Foo --|> #Bar
-	<>--- #Baz
-	<*>--- #Quuux
+	<>-- #Baz
+	*-- #Quuux
 ===
-#Baz <*>--- #Quuux) diagram.
+#Baz *-- #Quuux) diagram.
 	self assert: (String streamContents: [:stream | diagram printMicroUMLWithAssociationsUnderClassesOn: stream]) equals: 'MicroUMLAstBuilder
 ===
 #Foo --|> #Bar
-  <>--- #Baz
-  <*>--- #Quuux
+  <>-- #Baz
+  *-- #Quuux
 ===
-#Baz <*>--- #Quuux'
+#Baz *-- #Quuux'
 ]

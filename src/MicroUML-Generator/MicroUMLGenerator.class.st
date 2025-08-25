@@ -21,7 +21,7 @@ MicroUMLGenerator class >> example [
 ]
 
 { #category : 'examples' }
-MicroUMLGenerator class >> exampleRoassal [
+MicroUMLGenerator class >> exampleArrayHierarchy [
 
 	(MicroUMLRoassalBuilder new classDiagramNode: (self new
 				  generateClass: ArrayedCollection;
@@ -29,6 +29,20 @@ MicroUMLGenerator class >> exampleRoassal [
 				  generateClass: Float64Array;
 				  generateClass: IntegerArray;
 				  generateClass: PointArray;
+				  diagram)) build
+		zoomToFit;
+		@ RSCanvasController;
+		openWithTitle: self name
+]
+
+{ #category : 'examples' }
+MicroUMLGenerator class >> exampleClassHierarchy [
+
+	(MicroUMLRoassalBuilder new classDiagramNode: (self new
+				  generateClass: ReadStream;
+				  generateClass: WriteStream;
+				  generateClass: ReadWriteStream;
+				  generateClass: PositionableStream;				
 				  diagram)) build
 		zoomToFit;
 		@ RSCanvasController;
@@ -57,6 +71,12 @@ MicroUMLGenerator >> classNodeClass [
 MicroUMLGenerator >> diagram [
 
 	^ diagram
+]
+
+{ #category : 'accessing' }
+MicroUMLGenerator >> ensureClass: aClass [
+
+	^ self ensureClassNamed: aClass name
 ]
 
 { #category : 'accessing' }

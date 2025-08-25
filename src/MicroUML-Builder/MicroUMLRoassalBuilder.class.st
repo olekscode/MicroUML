@@ -16,32 +16,7 @@ Class {
 MicroUMLRoassalBuilder class >> exampleSerie [
 
 	| uml builder |
-	uml := 
-#(abstract) % #AbstractSeries 
-	+ #name @ String 
-	- #(abstract) % #numEpisodes @ Integer
-	+ #(static) % #findByName ~#(String) @ #AbstractSeries
-=== 
-#NovelSeries 
-	--|> #AbstractSeries
-	+ #author @ String 
-	* #Publisher @ String 
-	+ #read~{}
-=== 
-#ComicSeries 
-	--|> #AbstractSeries 
-	+ #toonAuthor @ String
-	* #storyAuthor @ String 
-	+ #print~{} 
-=== 
-#AnimeSeries
-	--|> #AbstractSeries 
-	+ #director @ String 
-	- #animators @ String
-	- #voiceActors @ String 
-	+ #play~{} 
-	<><'original'>---<'comicalize'> #ComicSeries 
-	<><'main'>---<'side stories'> #NovelSeries .
+	uml := MicroUMLAstBuilder exampleSerie.
 	builder := MicroUMLRoassalBuilder new
 		           classDiagramNode: uml diagram;
 		           build.
@@ -54,34 +29,7 @@ MicroUMLRoassalBuilder class >> exampleSerie [
 MicroUMLRoassalBuilder class >> exampleSerie2 [
 
 	| uml builder |
-	uml := 
-#(abstract) % #AbstractSeries 
-   --@ #TSearch
-	--@ #TArtifact
-	+ #name @ String 
-	- #(abstract) % #numEpisodes @ Integer
-	+ #(static) % #findByName ~#(String) @ #AbstractSeries
-=== 
-#NovelSeries 
-	--|> #AbstractSeries
-	+ #author @ String 
-	* #Publisher @ String 
-	+ #read~{}
-=== 
-#ComicSeries 
-	--|> #AbstractSeries 
-	+ #toonAuthor @ String
-	* #storyAuthor @ String 
-	+ #print~{} 
-=== 
-#AnimeSeries
-	--|> #AbstractSeries 
-	+ #director @ String 
-	- #animators @ String
-	- #voiceActors @ String 
-	+ #play~{} 
-	<><'original'>---<'comicalize'> #ComicSeries 
-	<><'main'>---<'side stories'> #NovelSeries .
+	uml := MicroUMLAstBuilder exampleSerie2.
 	builder := MicroUMLRoassalBuilder new
 		           classDiagramNode: uml diagram;
 		           build.
@@ -321,14 +269,18 @@ MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 { #category : 'instance creation' }
 MicroUMLRoassalBuilder >> newEdgeFor: aMicroUMLAssociationNode [
 
-	^ RSBezier new
-		  model: aMicroUMLAssociationNode;
-		  color: Color black;
-		  markerStart:
-			  (self newMarkerFor: aMicroUMLAssociationNode leftHead);
-		  markerEnd: (self newMarkerFor: aMicroUMLAssociationNode rightHead);
-		  attachPoint: RSBorderAttachPoint new;
-		  yourself
+	| bazier |
+	bazier := RSBezier new
+		          model: aMicroUMLAssociationNode;
+		          color: Color black;
+		          markerStart:
+			          (self newMarkerFor: aMicroUMLAssociationNode leftHead);
+		          markerEnd:
+			          (self newMarkerFor: aMicroUMLAssociationNode rightHead);
+		          attachPoint: RSBorderAttachPoint new;
+		          yourself.
+	aMicroUMLAssociationNode line = #dashed ifTrue: [ bazier dashed ].
+	^ bazier
 ]
 
 { #category : 'instance creation' }
@@ -377,6 +329,24 @@ MicroUMLRoassalBuilder >> newMarkerFor: aSymbol [
 				   borderColor: Color black;
 				   borderWidth: 1;
 				   asMarker) offset: 8 ].
+	aSymbol = #arrowhead ifTrue: [
+			^ RSPolygon new
+				  points: {
+						  (-5 @ 5).
+						  (0 @ 0).
+						  (5 @ 5).
+						  (0 @ 0) };
+				  color: Color black;
+				  asMarker ].
+	aSymbol = #wedge ifTrue: [
+			^ RSPolygon new
+				  points: {
+						  (-5 @ 5).
+						  (0 @ 0).
+						  (5 @ 5).
+						  (0 @ 2) };
+				  color: Color black;
+				  asMarker ].
 	^ nil
 ]
 

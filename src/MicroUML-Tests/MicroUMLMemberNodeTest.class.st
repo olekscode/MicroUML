@@ -94,26 +94,31 @@ MicroUMLMemberNodeTest >> testName [
 	self assert: member name equals: #foo
 ]
 
+{ #category : 'utilities' }
+MicroUMLMemberNodeTest >> testPrintMicroUML: aString [
+
+	| association generatedSource1 generatedSource2 |
+	association := (OpalCompiler new evaluate: aString) currentClass
+		               currentMember.
+	generatedSource1 := association microUMLSource.
+	association := (OpalCompiler new evaluate: aString) currentClass
+		               currentMember.
+	generatedSource2 := association microUMLSource.
+	self assert: generatedSource2 equals: generatedSource1
+]
+
 { #category : 'tests' }
 MicroUMLMemberNodeTest >> testPrintMicroUMLOn [
 
-	member := (#Quuux * #foo classAt: #Quuux) memberAt: #foo.
 	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '* #foo'.
-	member := (#Quuux + #foo % #abstract @ #Bar classAt: #Quuux)
-		          memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '+ #foo @ #Bar % #abstract'.
-	member := (#Quuux >- #foo ~ #( Bar ) @ #Baz % #abstract classAt:
-		           #Quuux) memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '>- #foo ~#(Bar) @ #Baz % #abstract'
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo - #bar @ String % #abstract %#private';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo > #bar ~#(Integer Boolean) @ String % #abstract %#private';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo |- #bar @ String % #abstract %#private';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo |> #bar ~#(Integer Boolean) @ String % #abstract %#private'
 ]
 
 { #category : 'tests' }

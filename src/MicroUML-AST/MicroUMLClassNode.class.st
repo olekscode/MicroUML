@@ -19,18 +19,6 @@ Class {
 	#package : 'MicroUML-AST'
 }
 
-{ #category : 'examples' }
-MicroUMLClassNode class >> exampleAbstractSerie [
-
-	^ MicroUMLAstBuilder exampleSerie classAt: #AbstractSerie
-]
-
-{ #category : 'examples' }
-MicroUMLClassNode class >> exampleComixSerie [
-
-	^ MicroUMLAstBuilder exampleSerie classAt: #ComixSerie
-]
-
 { #category : 'adding' }
 MicroUMLClassNode >> addAttribute: aSymbolOrNil [
 
@@ -91,7 +79,7 @@ MicroUMLClassNode >> attributesCollect: aBlock [
 { #category : 'enumerating' }
 MicroUMLClassNode >> attributesDo: aBlock [
 
-	self membersDo: [ :member |
+	members do: [ :member |
 		member isAttribute ifTrue: [ aBlock value: member ] ]
 ]
 
@@ -123,13 +111,6 @@ MicroUMLClassNode >> beTrait [
 MicroUMLClassNode >> currentMember [
 
 	^ members ifNotEmpty: #last ifEmpty: [ nil ]
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> currentMemberName: aSymbol [
-
-	self currentMember name: aSymbol.
-	^ aSymbol
 ]
 
 { #category : 'initialization' }
@@ -190,18 +171,6 @@ MicroUMLClassNode >> members [
 	^ members asArray
 ]
 
-{ #category : 'enumerating' }
-MicroUMLClassNode >> membersCollect: aBlock [
-
-	^ (members collect: aBlock) asArray
-]
-
-{ #category : 'enumerating' }
-MicroUMLClassNode >> membersDo: aBlock [
-
-	members do: aBlock
-]
-
 { #category : 'accessing' }
 MicroUMLClassNode >> methodAt: aSymbol [
 
@@ -226,8 +195,14 @@ MicroUMLClassNode >> methodsCollect: aBlock [
 { #category : 'enumerating' }
 MicroUMLClassNode >> methodsDo: aBlock [
 
-	self membersDo: [ :member |
+	members do: [ :member |
 		member isMethod ifTrue: [ aBlock value: member ] ]
+]
+
+{ #category : 'printing' }
+MicroUMLClassNode >> microUMLSource [
+
+	^ String streamContents: [ :stream | self printMicroUMLOn: stream ]
 ]
 
 { #category : 'accessing' }

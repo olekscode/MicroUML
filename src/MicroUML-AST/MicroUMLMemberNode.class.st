@@ -149,6 +149,12 @@ MicroUMLMemberNode >> isPublic [
 	^ self visibility = #public
 ]
 
+{ #category : 'printing' }
+MicroUMLMemberNode >> microUMLSource [
+
+	^ String streamContents: [ :stream | self printMicroUMLOn: stream ]
+]
+
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers [
 
@@ -185,19 +191,8 @@ MicroUMLMemberNode >> name: anObject [
 MicroUMLMemberNode >> printMicroUMLOn: aStream [
 	" #argumentTypes  . #type   "
 
-	aStream nextPutAll: (isMethod = true
-			 ifTrue: [
-					 {
-						 (#public -> '>+ ').
-						 (#private -> '>- ') } asDictionary
-						 at: visibility
-						 ifAbsent: [ '>> ' ] ]
-			 ifFalse: [
-					 {
-						 (#public -> '+ ').
-						 (#private -> '- ') } asDictionary
-						 at: visibility
-						 ifAbsent: [ '* ' ] ]).
+	aStream nextPutAll: (self isMethod
+			 ifTrue: [ '> ' ] ifFalse: [ '- ' ]).
 	self name storeOn: aStream.
 	self argumentTypes ifNotNil: [ :symbols |
 			aStream nextPutAll: ' ~#('.
