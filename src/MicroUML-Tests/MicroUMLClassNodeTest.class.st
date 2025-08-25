@@ -83,29 +83,12 @@ MicroUMLClassNodeTest >> testAttributesDo [
 ]
 
 { #category : 'tests' }
-MicroUMLClassNodeTest >> testBeAbstract [
-
-	self deny: class isAbstract.
-	class beAbstract.
-	self assert: class isAbstract
-]
-
-{ #category : 'tests' }
 MicroUMLClassNodeTest >> testBeClass [
 
 	class beTrait.
 	self assert: (class keywords includes: #trait).
 	class beClass.
 	self deny: (class keywords includes: #trait)
-]
-
-{ #category : 'tests' }
-MicroUMLClassNodeTest >> testBeConcrete [
-
-	class beAbstract.
-	self deny: class isConcrete.
-	class beConcrete.
-	self assert: class isConcrete
 ]
 
 { #category : 'tests' }

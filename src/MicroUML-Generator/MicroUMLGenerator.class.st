@@ -117,9 +117,8 @@ MicroUMLGenerator >> generateMethod: aSymbol in: aClass [
 				methodNode argumentTypes:
 					(compiledMethod ast arguments collect: [ :arg |
 						 self guessParameterType: arg name ]) asArray.
-				compiledMethod isAbstract
-					ifTrue: [ methodNode beAbstract ]
-					ifFalse: [ methodNode beConcrete ] ].
+				compiledMethod isAbstract ifTrue: [
+					methodNode addModifier: #abstract ] ].
 	aClass isMeta
 		ifTrue: [ methodNode beClassSide ]
 		ifFalse: [ methodNode beInstanceSide ].

@@ -22,15 +22,13 @@ Class {
 { #category : 'adding' }
 MicroUMLMemberNode >> addModifier: aSymbol [
 
-	| mod |
-	mod := aSymbol asSymbol.
-	mod = #abstract ifTrue: [
+	aSymbol = #abstract ifTrue: [
 			isAbstract := true.
 			^ aSymbol ].
-	mod = #static ifTrue: [
-			isClassSide := true.
+	(#( public protected private ) includes: aSymbol) ifTrue: [
+			visibility := aSymbol.
 			^ aSymbol ].
-	^ aSymbol
+	^ nil
 ]
 
 { #category : 'accessing' }
@@ -45,42 +43,10 @@ MicroUMLMemberNode >> argumentTypes: anArrayOfSymbol [
 	argumentTypes := anArrayOfSymbol
 ]
 
-{ #category : 'converting' }
-MicroUMLMemberNode >> asRSShape [
-
-	^ RSLabel
-		  text: (String streamContents: [ :stream |
-					   self isPublic ifTrue: [ stream nextPut: $+ ].
-					   self isPrivate ifTrue: [ stream nextPut: $- ].
-					   stream nextPutAll: name.
-					   argumentTypes ifNotNil: [
-							   stream
-								   nextPut: $(;
-								   nextPutAll: (', ' join: argumentTypes);
-								   nextPut: $) ].
-					   type ifNotNil: [
-							   stream
-								   nextPut: $:;
-								   nextPutAll: type ] ])
-		  model: self
-]
-
-{ #category : 'accessing' }
-MicroUMLMemberNode >> beAbstract [
-
-	isAbstract := true
-]
-
 { #category : 'accessing' }
 MicroUMLMemberNode >> beClassSide [
 
 	isClassSide := true
-]
-
-{ #category : 'accessing' }
-MicroUMLMemberNode >> beConcrete [
-
-	isAbstract := false
 ]
 
 { #category : 'accessing' }
@@ -96,9 +62,23 @@ MicroUMLMemberNode >> bePrivate [
 ]
 
 { #category : 'accessing' }
+MicroUMLMemberNode >> beProtected [
+
+	visibility := #protected
+]
+
+{ #category : 'accessing' }
 MicroUMLMemberNode >> bePublic [
 
 	visibility := #public
+]
+
+{ #category : 'accessing' }
+MicroUMLMemberNode >> defaultVisibility [
+
+	^ self isMethod
+		  ifTrue: [ #public ]
+		  ifFalse: [ #protected ]
 ]
 
 { #category : 'initialization' }
@@ -154,27 +134,39 @@ MicroUMLMemberNode >> isMethod: aBooleanOrNil [
 { #category : 'testing' }
 MicroUMLMemberNode >> isPrivate [
 
-	^ visibility = #private
+	^ self visibility = #private
+]
+
+{ #category : 'testing' }
+MicroUMLMemberNode >> isProtected [
+
+	^ self visibility = #protected
 ]
 
 { #category : 'testing' }
 MicroUMLMemberNode >> isPublic [
 
-	^ visibility = #public
+	^ self visibility = #public
 ]
 
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers [
 
 	^ Array streamContents: [ :stream |
-		  self isAbstract ifTrue: [ stream nextPut: #abstract ] ]
+			  self isAbstract ifTrue: [ stream nextPut: #abstract ].
+			  self visibility ~= self defaultVisibility ifTrue: [
+				  stream nextPut: self visibility ] ]
 ]
 
 { #category : 'accessing' }
 MicroUMLMemberNode >> modifiers: anArrayOfSymbol [
 
 	isAbstract := anArrayOfSymbol includes: #abstract.
-	isClassSide := anArrayOfSymbol includes: #static
+	(anArrayOfSymbol includes: #public) ifTrue: [ visibility := #public ].
+	(anArrayOfSymbol includes: #protected) ifTrue: [
+		visibility := #protected ].
+	(anArrayOfSymbol includes: #private) ifTrue: [
+		visibility := #private ]
 ]
 
 { #category : 'accessing' }
@@ -237,7 +229,7 @@ MicroUMLMemberNode >> type: aSymbol [
 { #category : 'accessing' }
 MicroUMLMemberNode >> visibility [
 
-	^ visibility
+	^ visibility ifNil: [ self defaultVisibility ]
 ]
 
 { #category : 'accessing' }

@@ -22,28 +22,11 @@ MicroUMLMemberNodeTest >> testArgumentTypes [
 ]
 
 { #category : 'tests' }
-MicroUMLMemberNodeTest >> testBeAbstract [
-
-	self deny: member isAbstract.
-	member beAbstract.
-	self assert: member isAbstract
-]
-
-{ #category : 'tests' }
 MicroUMLMemberNodeTest >> testBeClassSide [
 
 	self deny: member isClassSide.
 	member beClassSide.
 	self assert: member isClassSide
-]
-
-{ #category : 'tests' }
-MicroUMLMemberNodeTest >> testBeConcrete [
-
-	member beAbstract.
-	self deny: member isConcrete.
-	member beConcrete.
-	self assert: member isConcrete
 ]
 
 { #category : 'tests' }
@@ -53,22 +36,6 @@ MicroUMLMemberNodeTest >> testBeInstanceSide [
 	self deny: member isInstanceSide.
 	member beInstanceSide.
 	self assert: member isInstanceSide
-]
-
-{ #category : 'tests' }
-MicroUMLMemberNodeTest >> testBePrivate [
-
-	self deny: member isPrivate.
-	member bePrivate.
-	self assert: member isPrivate
-]
-
-{ #category : 'tests' }
-MicroUMLMemberNodeTest >> testBePublic [
-
-	self deny: member isPublic.
-	member bePublic.
-	self assert: member isPublic
 ]
 
 { #category : 'tests' }

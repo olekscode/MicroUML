@@ -40,12 +40,6 @@ MicroUMLClassNode >> addAttribute: aSymbolOrNil [
 ]
 
 { #category : 'adding' }
-MicroUMLClassNode >> addMember: aSymbolOrNil [
-
-	^ members add: (self memberNodeClass new name: aSymbolOrNil)
-]
-
-{ #category : 'adding' }
 MicroUMLClassNode >> addMethod: aSymbolOrNil [
 
 	^ members add: (self memberNodeClass new
@@ -64,7 +58,7 @@ MicroUMLClassNode >> addModifier: aSymbol [
 	mod = #trait ifTrue: [
 			isTrait := true.
 			^ aSymbol ].
-	^ aSymbol
+	^ nil
 ]
 
 { #category : 'adding' }
