@@ -85,3 +85,15 @@ Class >> > aSymbol [
 
 	^ MicroUMLAstBuilder new === self > aSymbol
 ]
+
+{ #category : '*MicroUML-Builder' }
+Class >> classDiagram [
+
+	^ MicroUMLAstBuilder === self
+]
+
+{ #category : '*MicroUML-Builder' }
+Class >> mu [
+
+	^ MicroUMLAstBuilder === self
+]

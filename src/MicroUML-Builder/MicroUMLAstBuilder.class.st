@@ -173,8 +173,8 @@ MicroUMLAstBuilder class >> exampleSerie2 [
 	- #animators @ String % #private
 	- #voiceActors @ String % #private
 	> #play~{} 
-	<>-- #ComicSeries @ ('original' -> 'comicalize')
-	<>-- #NovelSeries @ ('main' ->'side stories').
+	<>-- #ComicSeries @ ('original' -> 'comicalize') %< '1' %> '0..*'
+	<>-- #NovelSeries @ ('main' ->'side stories') %< '1..*' %> '*'.
 ]
 
 { #category : 'UML - members' }
