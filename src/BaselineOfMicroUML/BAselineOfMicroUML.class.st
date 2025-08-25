@@ -20,7 +20,7 @@ BaselineOfMicroUML >> baseline: spec [
 				package: 'MicroUML-AST';
 				package: 'MicroUML-Builder';
 				package: 'MicroUML-Generator';
-				package: 'MicroUML-Editor';
+				package: 'MicroUML-Editor'
 				with: [ spec requires: #(RoassalExporters) ];
 				package: 'MicroUML-Tests'
 				with: [ spec requires: #('MicroUML-AST' 'MicroUML-Builder' 'MicroUML-Generator' 'MicroUML-Editor') ] ]
