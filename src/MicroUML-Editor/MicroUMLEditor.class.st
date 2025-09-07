@@ -22,33 +22,7 @@ MicroUMLEditor class >> example [
 MicroUMLEditor class >> exampleWithDiagram [
 	<example>
 	| uml |
-	
-	uml :=
-	#AbstractSeries 
-    	+ #name @ String 
-    	* #numEpisodes @ Integer
-	=== 
-	#NovelSeries 
-    	--|> #AbstractSeries
-    	+ #author @ String 
-    	+ #Publisher @ String 
-    	>+ #read~{}
-	=== 
-	#ComicSeries 
-    	--|> #AbstractSeries 
-    	+ #toonAuthor @ String
-    	* #storyAuthor @ String
-   		>+ #print~{}
-	=== 
-	#AnimeSeries
-		--|> #AbstractSeries 
-		+ #director @ String 
-		* #animators @ String
-		* #voiceActors @ String
-		>+ #play~{} <>---<'based on'> #ComicSeries
-	=== 
-	#ComicSeries ---<'original'> #NovelSeries.
-	
+	uml := MicroUMLAstBuilder exampleSerie2.
 	(self withDiagram: uml diagram) open
 ]
 
