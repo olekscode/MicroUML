@@ -18,6 +18,48 @@ MicroUMLEditor class >> example [
 	self new open
 ]
 
+{ #category : 'examples' }
+MicroUMLEditor class >> exampleWithDiagram [
+	<example>
+	| uml |
+	
+	uml :=
+	#AbstractSeries 
+    	+ #name @ String 
+    	* #numEpisodes @ Integer
+	=== 
+	#NovelSeries 
+    	--|> #AbstractSeries
+    	+ #author @ String 
+    	+ #Publisher @ String 
+    	>+ #read~{}
+	=== 
+	#ComicSeries 
+    	--|> #AbstractSeries 
+    	+ #toonAuthor @ String
+    	* #storyAuthor @ String
+   		>+ #print~{}
+	=== 
+	#AnimeSeries
+		--|> #AbstractSeries 
+		+ #director @ String 
+		* #animators @ String
+		* #voiceActors @ String
+		>+ #play~{} <>---<'based on'> #ComicSeries
+	=== 
+	#ComicSeries ---<'original'> #NovelSeries.
+	
+	(self withDiagram: uml diagram) open
+]
+
+{ #category : 'as yet unclassified' }
+MicroUMLEditor class >> withDiagram: aDiagram [
+
+	^ self new
+		showDiagram: aDiagram;
+		yourself
+]
+
 { #category : 'compiling' }
 MicroUMLEditor >> compileUml [
 
@@ -152,4 +194,11 @@ MicroUMLEditor >> saveAsPng [
 				exportToFile: fileReference ]
 
 	
+]
+
+{ #category : 'as yet unclassified' }
+MicroUMLEditor >> showDiagram: aDiagram [
+
+	code text: aDiagram microUML.
+	self drawDiagram
 ]
