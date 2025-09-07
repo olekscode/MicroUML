@@ -95,6 +95,12 @@ MicroUMLClassDiagramNode >> initialize [
 ]
 
 { #category : 'printing' }
+MicroUMLClassDiagramNode >> microUMLSource [
+
+	^ String streamContents: [ :stream | self printMicroUMLOn: stream ]
+]
+
+{ #category : 'printing' }
 MicroUMLClassDiagramNode >> printMicroUMLOn: aStream [
 
 	self printMicroUMLOn: aStream associationsUnderClasses: true

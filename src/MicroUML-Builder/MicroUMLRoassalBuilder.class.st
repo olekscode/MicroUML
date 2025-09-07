@@ -6,7 +6,9 @@ Class {
 	#name : 'MicroUMLRoassalBuilder',
 	#superclass : 'RSBuilder',
 	#instVars : [
-		'classDiagramNode'
+		'classDiagramNode',
+		'nodes',
+		'edges'
 	],
 	#category : 'MicroUML-Builder',
 	#package : 'MicroUML-Builder'
@@ -16,32 +18,7 @@ Class {
 MicroUMLRoassalBuilder class >> exampleSerie [
 
 	| uml builder |
-	uml := 
-#(abstract) % #AbstractSeries 
-	+ #name @ String 
-	- #(abstract) % #numEpisodes @ Integer
-	+ #(static) % #findByName ~#(String) @ #AbstractSeries
-=== 
-#NovelSeries 
-	--|> #AbstractSeries
-	+ #author @ String 
-	* #Publisher @ String 
-	+ #read~{}
-=== 
-#ComicSeries 
-	--|> #AbstractSeries 
-	+ #toonAuthor @ String
-	* #storyAuthor @ String 
-	+ #print~{} 
-=== 
-#AnimeSeries
-	--|> #AbstractSeries 
-	+ #director @ String 
-	- #animators @ String
-	- #voiceActors @ String 
-	+ #play~{} 
-	<><'original'>---<'comicalize'> #ComicSeries 
-	<><'main'>---<'side stories'> #NovelSeries .
+	uml := MicroUMLAstBuilder exampleSerie.
 	builder := MicroUMLRoassalBuilder new
 		           classDiagramNode: uml diagram;
 		           build.
@@ -54,40 +31,18 @@ MicroUMLRoassalBuilder class >> exampleSerie [
 MicroUMLRoassalBuilder class >> exampleSerie2 [
 
 	| uml builder |
-	uml := 
-#(abstract) % #AbstractSeries 
-   --@ #TSearch
-	--@ #TArtifact
-	+ #name @ String 
-	- #(abstract) % #numEpisodes @ Integer
-	+ #(static) % #findByName ~#(String) @ #AbstractSeries
-=== 
-#NovelSeries 
-	--|> #AbstractSeries
-	+ #author @ String 
-	* #Publisher @ String 
-	+ #read~{}
-=== 
-#ComicSeries 
-	--|> #AbstractSeries 
-	+ #toonAuthor @ String
-	* #storyAuthor @ String 
-	+ #print~{} 
-=== 
-#AnimeSeries
-	--|> #AbstractSeries 
-	+ #director @ String 
-	- #animators @ String
-	- #voiceActors @ String 
-	+ #play~{} 
-	<><'original'>---<'comicalize'> #ComicSeries 
-	<><'main'>---<'side stories'> #NovelSeries .
+	uml := MicroUMLAstBuilder exampleSerie2.
 	builder := MicroUMLRoassalBuilder new
 		           classDiagramNode: uml diagram;
 		           build.
 	builder
 		@ RSCanvasController;
 		open
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> accessMarkFor: aMicroUMLMemberNode [
+	
 ]
 
 { #category : 'edge layouting' }
@@ -175,7 +130,15 @@ MicroUMLRoassalBuilder >> geometriesInCanvas: aRSCanvas [
 { #category : 'accessing' }
 MicroUMLRoassalBuilder >> horizontalGap [
 
-	^ 80
+	^ 150
+]
+
+{ #category : 'initialization' }
+MicroUMLRoassalBuilder >> initialize [
+
+	super initialize.
+	nodes := Dictionary new.
+	edges := OrderedCollection new
 ]
 
 { #category : 'testing' }
@@ -321,14 +284,18 @@ MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 { #category : 'instance creation' }
 MicroUMLRoassalBuilder >> newEdgeFor: aMicroUMLAssociationNode [
 
-	^ RSBezier new
-		  model: aMicroUMLAssociationNode;
-		  color: Color black;
-		  markerStart:
-			  (self newMarkerFor: aMicroUMLAssociationNode leftHead);
-		  markerEnd: (self newMarkerFor: aMicroUMLAssociationNode rightHead);
-		  attachPoint: RSBorderAttachPoint new;
-		  yourself
+	| bazier |
+	bazier := RSBezier new
+		          model: aMicroUMLAssociationNode;
+		          color: Color black;
+		          markerStart:
+			          (self newMarkerFor: aMicroUMLAssociationNode leftHead);
+		          markerEnd:
+			          (self newMarkerFor: aMicroUMLAssociationNode rightHead);
+		          attachPoint: RSBorderAttachPoint new;
+		          yourself.
+	aMicroUMLAssociationNode line = #dashed ifTrue: [ bazier dashed ].
+	^ bazier
 ]
 
 { #category : 'instance creation' }
@@ -377,6 +344,24 @@ MicroUMLRoassalBuilder >> newMarkerFor: aSymbol [
 				   borderColor: Color black;
 				   borderWidth: 1;
 				   asMarker) offset: 8 ].
+	aSymbol = #arrowhead ifTrue: [
+			^ (RSPolygon new
+				   points: {
+						   (-5 @ 5).
+						   (0 @ 0).
+						   (5 @ 5).
+						   (0 @ 0) };
+				   color: Color black;
+				   asMarker) offset: 5 ].
+	aSymbol = #wedge ifTrue: [
+			^ (RSPolygon new
+				   points: {
+						   (-7 @ 7).
+						   (0 @ 0).
+						   (7 @ 7).
+						   (0 @ 3) };
+				   color: Color black;
+				   asMarker) offset: 7 ].
 	^ nil
 ]
 
@@ -386,16 +371,17 @@ MicroUMLRoassalBuilder >> newMemberLabelFor: aMicroUMLMemberNode [
 	| label |
 	label := RSLabel
 		         text: (String streamContents: [ :stream |
-					          aMicroUMLMemberNode isPrivate
-						          ifTrue: [ stream nextPut: $- ]
-						          ifFalse: [ stream nextPut: Character space ].
+					          stream nextPutAll:
+						          (self visibilityMarkFor: aMicroUMLMemberNode).
 					          stream nextPutAll: aMicroUMLMemberNode name.
-					          aMicroUMLMemberNode argumentTypes ifNotNil: [
-							          :argumentTypes |
-							          stream
-								          nextPut: $(;
-								          nextPutAll: (', ' join: argumentTypes);
-								          nextPut: $) ].
+					          aMicroUMLMemberNode isMethod ifTrue: [
+							          aMicroUMLMemberNode argumentTypes ifNotNil: [
+									          :argumentTypes |
+									          stream
+										          nextPut: $(;
+										          nextPutAll:
+											          (', ' join: aMicroUMLMemberNode argumentTypes);
+										          nextPut: $) ] ].
 					          aMicroUMLMemberNode type ifNotNil: [ :type |
 							          stream
 								          nextPut: $:;
@@ -431,6 +417,23 @@ MicroUMLRoassalBuilder >> offsetForLabel: aRSLabel markerExtent: aPoint directin
 		  ifFalse: [
 				  aRSLabel width * 0.5 + 2
 				  * (yetAnotherPoint x sign + 0.1) sign negated
+				  @ (aRSLabel height * 0.5 + 2 + aPoint y abs
+					   * (anotherPoint y sign + 0.5) sign) ]
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> offsetForMultiplicity: aRSLabel markerExtent: aPoint directing: anotherPoint to: yetAnotherPoint [
+
+	^ anotherPoint y abs <= anotherPoint x abs
+		  ifTrue: [
+				  aRSLabel width * 0.5 + 2 + aPoint x abs
+				  * (anotherPoint x sign + 0.1) sign
+				  @
+				  (aRSLabel height * 0.5 + 2 * (yetAnotherPoint y sign + 0.1) sign
+				   * 1.5) ]
+		  ifFalse: [
+				  aRSLabel width * 0.5 + 2
+				  * ((yetAnotherPoint x sign + 0.1) sign * 1.5)
 				  @ (aRSLabel height * 0.5 + 2 + aPoint y abs
 					   * (anotherPoint y sign + 0.5) sign) ]
 ]
@@ -745,9 +748,9 @@ MicroUMLRoassalBuilder >> renderExtraLink: aRSBezier from: aRSShape to: anotherR
 { #category : 'rendering' }
 MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 
-	| nodes edges lollipops connectedNodes extraEdges |
-	nodes := Dictionary new.
-	edges := OrderedCollection new.
+	| lollipops connectedNodes extraEdges |
+	nodes removeAll.
+	edges removeAll.
 	lollipops := Dictionary new.
 	connectedNodes := IdentitySet new.
 	extraEdges := OrderedCollection new.
@@ -836,6 +839,11 @@ MicroUMLRoassalBuilder >> renderIn: aRSCanvas [
 MicroUMLRoassalBuilder >> renderLinkLabelsFor: aRSBezier in: aRSCanvas [
 
 	aRSBezier model ifNotNil: [ :edge |
+			edge label ifNotNil: [ :text |
+					| label |
+					label := RSLabel new text: text.
+					label translateTo: (aRSBezier atT: 0.5).
+					aRSCanvas add: label ].
 			edge leftLabel ifNotNil: [ :text |
 					| label |
 					label := RSLabel new text: text.
@@ -862,7 +870,55 @@ MicroUMLRoassalBuilder >> renderLinkLabelsFor: aRSBezier in: aRSCanvas [
 							 - aRSBezier controlPoints last
 							 to:
 							 aRSBezier controlPoints first - aRSBezier controlPoints last).
-					aRSCanvas add: label ] ]
+					aRSCanvas add: label ].
+			edge leftMultiplicity ifNotNil: [ :text |
+					| label |
+					label := RSLabel new text: text.
+					label translateTo: aRSBezier controlPoints first + (self
+							 offsetForMultiplicity: label
+							 markerExtent: (aRSBezier markerStart
+									  ifNotNil: [ :m | m shape encompassingRectangle extent ]
+									  ifNil: [ 0 @ 0 ])
+							 directing:
+							 aRSBezier controlPoints second - aRSBezier controlPoints first
+							 to:
+							 aRSBezier controlPoints last - aRSBezier controlPoints first).
+					aRSCanvas add: label ].
+			edge rightMultiplicity ifNotNil: [ :text |
+					| label |
+					label := RSLabel new text: text.
+					label translateTo: aRSBezier controlPoints last + (self
+							 offsetForMultiplicity: label
+							 markerExtent: (aRSBezier markerEnd
+									  ifNotNil: [ :m | m shape encompassingRectangle extent ]
+									  ifNil: [ 0 @ 0 ])
+							 directing:
+							 (aRSBezier controlPoints atLast: 2)
+							 - aRSBezier controlPoints last
+							 to:
+							 aRSBezier controlPoints first - aRSBezier controlPoints last).
+					aRSCanvas add: label ].
+			edge associationClass ifNotNil: [ :associationClass |
+					nodes at: associationClass ifPresent: [ :shape |
+							| point1 point2 line |
+							point1 := aRSBezier atT: 0.5.
+							point2 := (((shape geometry intersectionsWithLine:
+								             (GLine
+									              through: point1
+									              and: shape encompassingRectangle center))
+								            collect: [ :gp |
+										            | p |
+										            p := gp x @ gp y.
+										            (p - point1) r -> p ]) asSortedCollection:
+								           #key ascending) first value.
+							line := RSLine new
+								        startPoint: point1;
+								        endPoint: point2;
+								        dashed;
+								        markerEnd: (self newMarkerFor: #wedge);
+								        color: Color black;
+								        yourself.
+							aRSCanvas add: line ] ] ]
 ]
 
 { #category : 'rendering' }
@@ -888,4 +944,15 @@ MicroUMLRoassalBuilder >> renderTraitLabelAt: aRSShape classNode: anotherRSShape
 MicroUMLRoassalBuilder >> verticalGap [
 
 	^ 100
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> visibilityMarkFor: aMicroUMLMemberNode [
+
+	aMicroUMLMemberNode visibility
+	= aMicroUMLMemberNode defaultVisibility ifTrue: [ ^ ' ' ].
+	aMicroUMLMemberNode visibility = #public ifTrue: [ ^ '+' ].
+	aMicroUMLMemberNode visibility = #protected ifTrue: [ ^ '#' ].
+	aMicroUMLMemberNode visibility = #private ifTrue: [ ^ '-' ].
+	^ ' '
 ]

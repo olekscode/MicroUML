@@ -18,6 +18,22 @@ MicroUMLEditor class >> example [
 	self new open
 ]
 
+{ #category : 'examples' }
+MicroUMLEditor class >> exampleWithDiagram [
+	<example>
+	| uml |
+	uml := MicroUMLAstBuilder exampleSerie2.
+	(self withDiagram: uml diagram) open
+]
+
+{ #category : 'as yet unclassified' }
+MicroUMLEditor class >> withDiagram: aDiagram [
+
+	^ self new
+		showDiagram: aDiagram;
+		yourself
+]
+
 { #category : 'compiling' }
 MicroUMLEditor >> compileUml [
 
@@ -58,14 +74,14 @@ MicroUMLEditor >> disableLiveDrawing [
 MicroUMLEditor >> drawDiagram [
 
 	| uml |
-	
 	uml := code text trimmed
-		ifEmpty: [ MicroUMLAstBuilder new ]
-		ifNotEmpty: [ self compileUml ].
-	
+		       ifEmpty: [ MicroUMLAstBuilder new ]
+		       ifNotEmpty: [ self compileUml ].
+
 	builder classDiagramNode: uml diagram.
 	builder canvas clear.
-	builder build @ RSCanvasController.
+	builder build.
+	builder canvas @ RSCanvasController.
 	builder container signalUpdate
 ]
 
@@ -152,4 +168,11 @@ MicroUMLEditor >> saveAsPng [
 				exportToFile: fileReference ]
 
 	
+]
+
+{ #category : 'as yet unclassified' }
+MicroUMLEditor >> showDiagram: aDiagram [
+
+	code text: aDiagram microUML.
+	self drawDiagram
 ]

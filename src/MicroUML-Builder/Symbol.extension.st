@@ -1,21 +1,39 @@
 Extension { #name : 'Symbol' }
 
 { #category : '*MicroUML-Builder' }
-Symbol >> * aSymbol [
+Symbol >> % aSymbol [
 
-	^ MicroUMLAstBuilder new === self * aSymbol
+	^ MicroUMLAstBuilder new === self % aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
-Symbol >> + aSymbol [
+Symbol >> *-- aSymbol [
 
-	^ MicroUMLAstBuilder new === self + aSymbol
+	^ MicroUMLAstBuilder new === self *-- aSymbol
+]
+
+{ #category : '*MicroUML-Builder' }
+Symbol >> *=> aSymbol [
+
+	^ MicroUMLAstBuilder new === self *=> aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
 Symbol >> - aSymbol [
 
 	^ MicroUMLAstBuilder new === self - aSymbol
+]
+
+{ #category : '*MicroUML-Builder' }
+Symbol >> -- aSymbol [
+
+	^ MicroUMLAstBuilder new === self -- aSymbol
+]
+
+{ #category : '*MicroUML-Builder' }
+Symbol >> --> aSymbol [
+
+	^ MicroUMLAstBuilder new === self --> aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
@@ -30,6 +48,18 @@ Symbol >> --|> aSymbolOrClass [
 	"Defines a subclass of the receiver. Note that this method is to define class description based on # e.g. #Point"
 	
 	^ MicroUMLAstBuilder new === self --|> aSymbolOrClass
+]
+
+{ #category : '*MicroUML-Builder' }
+Symbol >> <>-- aSymbol [
+
+	^ MicroUMLAstBuilder new === self <>-- aSymbol
+]
+
+{ #category : '*MicroUML-Builder' }
+Symbol >> <>=> aSymbol [
+
+	^ MicroUMLAstBuilder new === self <>=> aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
@@ -50,19 +80,19 @@ Symbol >> === aSymbolOrClass [
 ]
 
 { #category : '*MicroUML-Builder' }
-Symbol >> >+ aSymbol [
+Symbol >> => aSymbol [
 
-	^ MicroUMLAstBuilder new === self >+ aSymbol
+	^ MicroUMLAstBuilder new === self => aSymbol
 ]
 
 { #category : '*MicroUML-Builder' }
-Symbol >> >- aSymbol [
+Symbol >> classDiagram [
 
-	^ MicroUMLAstBuilder new === self >- aSymbol
+	^ MicroUMLAstBuilder === self
 ]
 
 { #category : '*MicroUML-Builder' }
-Symbol >> >> aSymbol [
+Symbol >> mu [
 
-	^ MicroUMLAstBuilder new === self >> aSymbol
+	^ MicroUMLAstBuilder === self
 ]
