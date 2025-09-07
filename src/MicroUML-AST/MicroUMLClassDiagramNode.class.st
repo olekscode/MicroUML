@@ -86,6 +86,12 @@ MicroUMLClassDiagramNode >> ensureClassNamed: aSymbol [
 				  yourself ]
 ]
 
+{ #category : 'accessing' }
+MicroUMLClassDiagramNode >> hasClassNamed: aStringOrSymbol [
+
+	^ classes includesKey: aStringOrSymbol asSymbol
+]
+
 { #category : 'initialization' }
 MicroUMLClassDiagramNode >> initialize [
 

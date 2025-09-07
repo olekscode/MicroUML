@@ -6,7 +6,8 @@ Class {
 		'preview',
 		'toolbar',
 		'liveDrawingButton',
-		'builder'
+		'builder',
+		'targetPackageName'
 	],
 	#category : 'MicroUML-Editor',
 	#package : 'MicroUML-Editor'
@@ -97,6 +98,23 @@ MicroUMLEditor >> example [
 	<script: 'self example'>
 ]
 
+{ #category : 'as yet unclassified' }
+MicroUMLEditor >> generateClasses [
+
+	| generator |
+	generator := MicroUMLCodeGenerator forDiagram: self compileUml diagram.
+	generator generateClassesInPackageNamed: targetPackageName 
+]
+
+{ #category : 'initialization' }
+MicroUMLEditor >> initialize [
+
+	super initialize.
+	
+	"Default package where classes will be generated. Set your own target package with targetPackageName:"
+	targetPackageName := '__MicroUML-Generated__'
+]
+
 { #category : 'initialization' }
 MicroUMLEditor >> initializePresenters [
 
@@ -137,6 +155,12 @@ MicroUMLEditor >> initializeToolbar [
 	toolbar add: liveDrawingButton.
 	
 	toolbar add: (self newToolbarButton
+		label: 'Generate';
+		icon: (self iconNamed: #smallNew);
+		action: [ self generateClasses ];
+		yourself).
+	
+	toolbar add: (self newToolbarButton
 		label: 'Save PNG';
 		icon: (self iconNamed: #smallScreenshot);
 		action: [ self saveAsPng ];
@@ -175,4 +199,10 @@ MicroUMLEditor >> showDiagram: aDiagram [
 
 	code text: aDiagram microUML.
 	self drawDiagram
+]
+
+{ #category : 'as yet unclassified' }
+MicroUMLEditor >> targetPackageName: aString [
+
+	targetPackageName := aString 
 ]
