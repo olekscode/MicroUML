@@ -19,18 +19,6 @@ Class {
 	#package : 'MicroUML-AST'
 }
 
-{ #category : 'examples' }
-MicroUMLClassNode class >> exampleAbstractSerie [
-
-	^ MicroUMLAstBuilder exampleSerie classAt: #AbstractSerie
-]
-
-{ #category : 'examples' }
-MicroUMLClassNode class >> exampleComixSerie [
-
-	^ MicroUMLAstBuilder exampleSerie classAt: #ComixSerie
-]
-
 { #category : 'adding' }
 MicroUMLClassNode >> addAttribute: aSymbolOrNil [
 
@@ -40,17 +28,25 @@ MicroUMLClassNode >> addAttribute: aSymbolOrNil [
 ]
 
 { #category : 'adding' }
-MicroUMLClassNode >> addMember: aSymbolOrNil [
-
-	^ members add: (self memberNodeClass new name: aSymbolOrNil)
-]
-
-{ #category : 'adding' }
 MicroUMLClassNode >> addMethod: aSymbolOrNil [
 
 	^ members add: (self memberNodeClass new
 			   name: aSymbolOrNil;
 			   isMethod: true)
+]
+
+{ #category : 'adding' }
+MicroUMLClassNode >> addModifier: aSymbol [
+
+	| mod |
+	mod := aSymbol asSymbol.
+	mod = #abstract ifTrue: [
+			isAbstract := true.
+			^ aSymbol ].
+	mod = #trait ifTrue: [
+			isTrait := true.
+			^ aSymbol ].
+	^ nil
 ]
 
 { #category : 'adding' }
@@ -83,7 +79,7 @@ MicroUMLClassNode >> attributesCollect: aBlock [
 { #category : 'enumerating' }
 MicroUMLClassNode >> attributesDo: aBlock [
 
-	self membersDo: [ :member |
+	members do: [ :member |
 		member isAttribute ifTrue: [ aBlock value: member ] ]
 ]
 
@@ -114,14 +110,7 @@ MicroUMLClassNode >> beTrait [
 { #category : 'accessing' }
 MicroUMLClassNode >> currentMember [
 
-	^ members last
-]
-
-{ #category : 'adding' }
-MicroUMLClassNode >> currentMemberName: aSymbol [
-
-	self currentMember name: aSymbol.
-	^ aSymbol
+	^ members ifNotEmpty: #last ifEmpty: [ nil ]
 ]
 
 { #category : 'initialization' }
@@ -182,18 +171,6 @@ MicroUMLClassNode >> members [
 	^ members asArray
 ]
 
-{ #category : 'enumerating' }
-MicroUMLClassNode >> membersCollect: aBlock [
-
-	^ (members collect: aBlock) asArray
-]
-
-{ #category : 'enumerating' }
-MicroUMLClassNode >> membersDo: aBlock [
-
-	members do: aBlock
-]
-
 { #category : 'accessing' }
 MicroUMLClassNode >> methodAt: aSymbol [
 
@@ -218,16 +195,22 @@ MicroUMLClassNode >> methodsCollect: aBlock [
 { #category : 'enumerating' }
 MicroUMLClassNode >> methodsDo: aBlock [
 
-	self membersDo: [ :member |
+	members do: [ :member |
 		member isMethod ifTrue: [ aBlock value: member ] ]
+]
+
+{ #category : 'printing' }
+MicroUMLClassNode >> microUMLSource [
+
+	^ String streamContents: [ :stream | self printMicroUMLOn: stream ]
 ]
 
 { #category : 'accessing' }
 MicroUMLClassNode >> modifiers [
 
-	^ (Array streamContents: [ :stream |
-			   isAbstract ifTrue: [ stream nextPut: #abstract ].
-			   isTrait ifTrue: [ stream nextPut: #trait ] ]) ifEmpty: [ nil ]
+	^ Array streamContents: [ :stream |
+			  isAbstract ifTrue: [ stream nextPut: #abstract ].
+			  isTrait ifTrue: [ stream nextPut: #trait ] ]
 ]
 
 { #category : 'accessing' }
@@ -257,13 +240,12 @@ MicroUMLClassNode >> name: aSymbol [
 { #category : 'printing' }
 MicroUMLClassNode >> printMicroUMLOn: aStream [
 
-	self modifiers ifNotNil: [ :modifiers |
-			aStream nextPutAll: '#('.
-			modifiers
-				do: [ :modifier | aStream nextPutAll: modifier ]
-				separatedBy: [ aStream space ].
-			aStream nextPutAll: ') % ' ].
 	self name asSymbol storeOn: aStream.
+	self modifiers ifNotNil: [ :modifiers |
+			modifiers do: [ :modifier |
+					aStream nextPutAll: ' % '.
+					modifier storeOn: aStream ] ].
+
 	self superclass ifNotNil: [ :superclassName |
 			(traits isEmpty and: [ members isEmpty ]) ifFalse: [
 					aStream
