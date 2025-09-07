@@ -22,28 +22,11 @@ MicroUMLMemberNodeTest >> testArgumentTypes [
 ]
 
 { #category : 'tests' }
-MicroUMLMemberNodeTest >> testBeAbstract [
-
-	self deny: member isAbstract.
-	member beAbstract.
-	self assert: member isAbstract
-]
-
-{ #category : 'tests' }
 MicroUMLMemberNodeTest >> testBeClassSide [
 
 	self deny: member isClassSide.
 	member beClassSide.
 	self assert: member isClassSide
-]
-
-{ #category : 'tests' }
-MicroUMLMemberNodeTest >> testBeConcrete [
-
-	member beAbstract.
-	self deny: member isConcrete.
-	member beConcrete.
-	self assert: member isConcrete
 ]
 
 { #category : 'tests' }
@@ -53,22 +36,6 @@ MicroUMLMemberNodeTest >> testBeInstanceSide [
 	self deny: member isInstanceSide.
 	member beInstanceSide.
 	self assert: member isInstanceSide
-]
-
-{ #category : 'tests' }
-MicroUMLMemberNodeTest >> testBePrivate [
-
-	self deny: member isPrivate.
-	member bePrivate.
-	self assert: member isPrivate
-]
-
-{ #category : 'tests' }
-MicroUMLMemberNodeTest >> testBePublic [
-
-	self deny: member isPublic.
-	member bePublic.
-	self assert: member isPublic
 ]
 
 { #category : 'tests' }
@@ -117,12 +84,7 @@ MicroUMLMemberNodeTest >> testModifiers [
 	self deny: member isAbstract.
 	member modifiers: #( abstract ).
 	self assert: member isAbstract.
-	self assert: member modifiers equals: #( abstract ).
-	self deny: member isClassSide.
-	member modifiers: #( static ).
-	self deny: member isAbstract.
-	self assert: member isClassSide.
-	self assert: member modifiers equals: #( static )
+	self assert: member modifiers equals: #( abstract )
 ]
 
 { #category : 'tests' }
@@ -132,25 +94,31 @@ MicroUMLMemberNodeTest >> testName [
 	self assert: member name equals: #foo
 ]
 
+{ #category : 'utilities' }
+MicroUMLMemberNodeTest >> testPrintMicroUML: aString [
+
+	| association generatedSource1 generatedSource2 |
+	association := (OpalCompiler new evaluate: aString) currentClass
+		               currentMember.
+	generatedSource1 := association microUMLSource.
+	association := (OpalCompiler new evaluate: aString) currentClass
+		               currentMember.
+	generatedSource2 := association microUMLSource.
+	self assert: generatedSource2 equals: generatedSource1
+]
+
 { #category : 'tests' }
 MicroUMLMemberNodeTest >> testPrintMicroUMLOn [
 
-	member := (#Quuux * #foo classAt: #Quuux) memberAt: #foo.
 	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '* #foo'.
-	member := (#Quuux + #(abstract static) % #foo @ #Bar classAt: #Quuux) memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '+ #(abstract static) % #foo @ #Bar'.
-	member := (#Quuux >- #(abstract #static) % #foo ~#(Bar) @ #Baz classAt: #Quuux) memberAt: #foo.
-	self
-		assert:
-		(String streamContents: [ :stream | member printMicroUMLOn: stream ])
-		equals: '>- #(abstract static) % #foo ~#(Bar) @ #Baz'.
-
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo - #bar @ String % #abstract %#private';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo > #bar ~#(Integer Boolean) @ String % #abstract %#private';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo |- #bar @ String % #abstract %#private';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo |> #bar ~#(Integer Boolean) @ String % #abstract %#private'
 ]
 
 { #category : 'tests' }

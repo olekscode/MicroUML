@@ -100,14 +100,14 @@ MicroUMLEditor >> disableLiveDrawing [
 MicroUMLEditor >> drawDiagram [
 
 	| uml |
-	
 	uml := code text trimmed
-		ifEmpty: [ MicroUMLAstBuilder new ]
-		ifNotEmpty: [ self compileUml ].
-	
+		       ifEmpty: [ MicroUMLAstBuilder new ]
+		       ifNotEmpty: [ self compileUml ].
+
 	builder classDiagramNode: uml diagram.
 	builder canvas clear.
-	builder build @ RSCanvasController.
+	builder build.
+	builder canvas @ RSCanvasController.
 	builder container signalUpdate
 ]
 
