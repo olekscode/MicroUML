@@ -161,5 +161,5 @@ MicroUMLCodeGenerator >> printMethodSignatureFor: umlMethodNode [
 	
 	^ String streamContents: [ :stream |
 		selectorParts with: argumentNames do: [ :selectorPart :arg |
-			stream << selectorPart << ': ' << arg ] ]
+			stream << selectorPart << ': ' << arg << ' ' ] ]
 ]
