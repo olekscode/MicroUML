@@ -9,6 +9,16 @@ Class {
 	#package : 'MicroUML-AST'
 }
 
+{ #category : 'adding' }
+MicroUMLClassDiagramNode >> addAssociation: aMicroUMLAssociationNode [
+
+	(associations
+		 at: aMicroUMLAssociationNode leftClass
+		 ifAbsentPut: [ OrderedCollection new ]) add:
+		aMicroUMLAssociationNode.
+	^ aMicroUMLAssociationNode
+]
+
 { #category : 'accessing' }
 MicroUMLClassDiagramNode >> associations [
 

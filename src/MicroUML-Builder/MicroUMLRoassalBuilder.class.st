@@ -349,10 +349,9 @@ MicroUMLRoassalBuilder >> newMarkerFor: aSymbol [
 				   points: {
 						   (-5 @ 5).
 						   (0 @ 0).
-						   (5 @ 5).
-						   (0 @ 0) };
+						   (5 @ 5) };
 				   color: Color black;
-				   asMarker) offset: 5 ].
+				   asMarker) offset: 2.5 ].
 	aSymbol = #wedge ifTrue: [
 			^ (RSPolygon new
 				   points: {
