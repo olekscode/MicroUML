@@ -45,7 +45,7 @@ MicroUMLGeneratorTest >> setUp [
 { #category : 'running' }
 MicroUMLGeneratorTest >> testGenerateAttributeIn [
 
-	| attribute |
+	| attribute association |
 	generator generateAttribute: #dummy in: self class.
 	attribute := (generator diagram classAt: self class name)
 		             attributeAt: #dummy.
@@ -59,7 +59,13 @@ MicroUMLGeneratorTest >> testGenerateAttributeIn [
 	self assert: attribute isAttribute.
 	self assert: attribute isClassSide.
 	self assert: attribute name equals: #classDummy.
-	self assert: attribute type isNil
+	self assert: attribute type isNil.
+	generator classNames: #( String ).
+	association := generator generateAttribute: #dummy in: self class.
+	self assert: association class equals: MicroUMLAssociationNode.
+	self assert: association leftClass equals: self class name.
+	self assert: association rightClass equals: #String.
+	self assert: association rightMultiplicity isNil
 ]
 
 { #category : 'running' }

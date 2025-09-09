@@ -2,7 +2,8 @@ Class {
 	#name : 'MicroUMLGenerator',
 	#superclass : 'Object',
 	#instVars : [
-		'diagram'
+		'diagram',
+		'classNames'
 	],
 	#category : 'MicroUML-Generator',
 	#package : 'MicroUML-Generator'
@@ -49,6 +50,24 @@ MicroUMLGenerator class >> exampleClassHierarchy [
 		openWithTitle: self name
 ]
 
+{ #category : 'examples' }
+MicroUMLGenerator class >> exampleOrderedCollection [
+
+	| diagram |
+	diagram := self new
+		           generateClasses: {
+				           SequenceableCollection.
+				           ArrayedCollection.
+				           Array.
+				           OrderedCollection };
+		           diagram.
+	diagram classesDo: [ :class | class removeAllMembers ].
+	(MicroUMLRoassalBuilder new classDiagramNode: diagram) build
+		zoomToFit;
+		@ RSCanvasController;
+		openWithTitle: self name
+]
+
 { #category : 'class access' }
 MicroUMLGenerator >> associationNodeClass [
 
@@ -59,6 +78,12 @@ MicroUMLGenerator >> associationNodeClass [
 MicroUMLGenerator >> classDiagramClass [
 
 	^ MicroUMLClassDiagramNode
+]
+
+{ #category : 'accessing' }
+MicroUMLGenerator >> classNames: aCollectionOfSymbols [
+
+	classNames := aCollectionOfSymbols asSet
 ]
 
 { #category : 'class access' }
@@ -88,16 +113,31 @@ MicroUMLGenerator >> ensureClassNamed: aSymbol [
 { #category : 'generating' }
 MicroUMLGenerator >> generateAttribute: aSymbol in: aClass [
 
-	| attributeNode |
-	attributeNode := (diagram ensureClassNamed:
-		                  aClass instanceSide name asSymbol) addAttribute:
-		                 aSymbol asSymbol.
+	| type attributeNode |
+	(self guessAssociation: aSymbol) ifNotNil: [ :association |
+			association
+				leftClass: aClass instanceSide name;
+				rightLabel: aSymbol;
+				rightHead: #arrowhead.
+			diagram addAssociation: association.
+			^ association ].
+	type := nil.
 	aClass
 		compiledMethodAt: (aSymbol , ':') asSymbol
 		ifPresent: [ :compiledMethod |
 				| parameter |
 				parameter := compiledMethod ast arguments first name asString.
-				attributeNode type: (self guessParameterType: parameter) asSymbol ].
+				(self guessAssociation: parameter) ifNotNil: [ :association |
+						association
+							leftClass: aClass instanceSide name;
+							rightLabel: aSymbol.
+						diagram addAssociation: association.
+						^ association ].
+				type := self guessParameterType: parameter ].
+	attributeNode := (diagram ensureClassNamed:
+		                  aClass instanceSide name asSymbol) addAttribute:
+		                 aSymbol asSymbol.
+	type ifNotNil: [ attributeNode type: type ].
 	aClass isMeta
 		ifTrue: [ attributeNode beClassSide ]
 		ifFalse: [ attributeNode beInstanceSide ].
@@ -125,6 +165,13 @@ MicroUMLGenerator >> generateClass: aClass [
 ]
 
 { #category : 'generating' }
+MicroUMLGenerator >> generateClasses: aCollectionOfClass [
+
+	classNames addAll: (aCollectionOfClass collect: #name).
+	aCollectionOfClass do: [ :class | self generateClass: class ]
+]
+
+{ #category : 'generating' }
 MicroUMLGenerator >> generateMethod: aSymbol in: aClass [
 
 	| methodNode |
@@ -146,14 +193,45 @@ MicroUMLGenerator >> generateMethod: aSymbol in: aClass [
 ]
 
 { #category : 'private' }
+MicroUMLGenerator >> guessAssociation: aString [
+
+	| name multiplicity |
+	multiplicity := nil.
+	name := aString withoutPrefixFollowedByUppercase: 'a'.
+	name := name withoutPrefixFollowedByUppercase: 'an'.
+	name withoutPrefix: 'CollectionOf' ifFollowedByUppercase: [ :n |
+			name := n.
+			multiplicity := '*' ].
+	name
+		withoutPrefix: 'OrderedCollectionOf'
+		ifFollowedByUppercase: [ :n |
+				name := n.
+				multiplicity := '*' ].
+	name withoutPrefix: 'ArrayOf' ifFollowedByUppercase: [ :n |
+			name := n.
+			multiplicity := '*' ].
+	name withoutPrefix: 'SetOf' ifFollowedByUppercase: [ :n |
+			name := n.
+			multiplicity := '*' ].
+	name := name capitalized.
+	^ (classNames includes: name)
+		  ifTrue: [
+				  self associationNodeClass new
+					  rightClass: name;
+					  rightMultiplicity: multiplicity;
+					  yourself ]
+		  ifFalse: [ nil ]
+]
+
+{ #category : 'private' }
 MicroUMLGenerator >> guessParameterType: aString [
 
-	(aString size > 2 and: [
-		 (aString beginsWith: 'an') and: [ (aString at: 3) isUppercase ] ])
-		ifTrue: [ ^ (aString allButFirst: 2) asSymbol ].
-	(aString size > 1 and: [
-		 (aString beginsWith: 'a') and: [ (aString at: 2) isUppercase ] ])
-		ifTrue: [ ^ aString allButFirst asSymbol ].
+	aString
+		withoutPrefix: 'a'
+		ifFollowedByUppercase: [ :name | ^ name asSymbol ].
+	aString
+		withoutPrefix: 'an'
+		ifFollowedByUppercase: [ :name | ^ name asSymbol ].
 	^ aString asSymbol
 ]
 
@@ -161,6 +239,7 @@ MicroUMLGenerator >> guessParameterType: aString [
 MicroUMLGenerator >> initialize [
 
 	super initialize.
+	classNames := Set new.
 	diagram := self classDiagramClass new
 ]
 

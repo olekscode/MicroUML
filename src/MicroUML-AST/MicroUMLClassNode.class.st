@@ -269,6 +269,12 @@ MicroUMLClassNode >> printMicroUMLOn: aStream [
 				separatedBy: [ aStream cr ] ]
 ]
 
+{ #category : 'removing' }
+MicroUMLClassNode >> removeAllMembers [
+
+	members removeAll
+]
+
 { #category : 'accessing' }
 MicroUMLClassNode >> superclass [
 
