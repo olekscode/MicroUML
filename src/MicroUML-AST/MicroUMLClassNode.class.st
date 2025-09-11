@@ -140,6 +140,12 @@ MicroUMLClassNode >> isEmptyDefinition [
 	^ superclass isNil and: [ members isEmpty ]
 ]
 
+{ #category : 'testing' }
+MicroUMLClassNode >> isMicroUMLClassNode [
+
+	^ true
+]
+
 { #category : 'accessing' }
 MicroUMLClassNode >> keywords [
 
