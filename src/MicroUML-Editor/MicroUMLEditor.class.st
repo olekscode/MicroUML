@@ -57,8 +57,8 @@ MicroUMLEditor >> defaultLayout [
 	^ SpBoxLayout newTopToBottom
 		spacing: 4;
 		add: toolbar expand: false;
-		add: (SpBoxLayout newLeftToRight
-			spacing: 4;
+		add: (SpPanedLayout newHorizontal
+			positionOfSlider: 0.5;
 			add: code;
 			add: preview;
 			yourself);
