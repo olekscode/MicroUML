@@ -11,6 +11,30 @@ MicroUMLMermaidGenerator class >> example [
 	^ MicroUMLAstBuilder exampleSerie2 diagram mermaidSource
 ]
 
+{ #category : 'examples' }
+MicroUMLMermaidGenerator class >> examplePNG [
+
+	^ MicroUMLAstBuilder exampleSerie2 diagram mermaidPNG asPresenter
+		  autoScale: true;
+		  open
+]
+
+{ #category : 'utilities' }
+MicroUMLMermaidGenerator class >> pakoFrom: aString [
+
+	| json zipped pako |
+	json := STONJSON toString: { ('code' -> aString) } asDictionary.
+	zipped := ByteArray streamContents: [ :stream |
+			          (ZLibWriteStream on: stream)
+				          nextPutAll: json utf8Encoded;
+				          close ].
+	pako := zipped base64Encoded.
+	pako := pako copyReplaceAll: '/' with: '_'.
+	pako := pako copyReplaceAll: '+' with: '-'.
+	[ pako last = $= ] whileTrue: [ pako := pako allButLast ].
+	^ pako
+]
+
 { #category : 'generating' }
 MicroUMLMermaidGenerator >> generateAssociation: aMicroUMLAssociationNode into: aStream [
 
