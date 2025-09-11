@@ -56,12 +56,10 @@ MicroUMLCodeGenerator >> ensureSuperclasses [
 	This method checks all superclasses and if they don't exist neither in the environment (Pharo image) nor in the UML definition, it adds them to the UML as subclasses of Object.
 	
 	It also replacess all nil superclasses with Object"
-		
+
 	diagram classes do: [ :each |
-		diagram ensureClassNamed: each superclass ].
-	
-	diagram classes do: [ :each |
-		each superclass ifNil: [ each superclass: Object ] ].
+			each superclass ifNil: [ each superclass: #Object ].
+			diagram ensureClassNamed: each superclass ]
 ]
 
 { #category : 'as yet unclassified' }
