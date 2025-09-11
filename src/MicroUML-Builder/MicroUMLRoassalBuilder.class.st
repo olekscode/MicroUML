@@ -535,8 +535,10 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toBottom: 
 MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toLeft: anotherRectangle do: aBlock [
 
 	| p1 p2 |
-	aRectangle bottom <= anotherRectangle center y ifFalse: [ ^ self ].
-	aRectangle center x <= anotherRectangle left ifFalse: [ ^ self ].
+	aRectangle bottom + self verticalGap <= anotherRectangle center y
+		ifFalse: [ ^ self ].
+	aRectangle center x + self horizontalGap <= anotherRectangle left
+		ifFalse: [ ^ self ].
 	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
 	p2 := self attachPointFromLeftOf: anotherRectangle to: aRectangle.
 	aBlock value: {
@@ -549,8 +551,10 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toLeft: an
 MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toRight: anotherRectangle do: aBlock [
 
 	| p1 p2 |
-	aRectangle bottom <= anotherRectangle center y ifFalse: [ ^ self ].
-	anotherRectangle right <= aRectangle center x ifFalse: [ ^ self ].
+	aRectangle bottom + self verticalGap <= anotherRectangle center y
+		ifFalse: [ ^ self ].
+	anotherRectangle right + self horizontalGap <= aRectangle center x
+		ifFalse: [ ^ self ].
 	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
 	p2 := self attachPointFromRightOf: anotherRectangle to: aRectangle.
 	aBlock value: {
@@ -563,7 +567,8 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toRight: a
 MicroUMLRoassalBuilder >> possibleControlPointsFromBottom: aRectangle toTop: anotherRectangle do: aBlock [
 
 	| p1 p2 middle |
-	aRectangle bottom < anotherRectangle top ifFalse: [ ^ self ].
+	aRectangle bottom + self verticalGap < anotherRectangle top ifFalse: [
+		^ self ].
 	p1 := self attachPointFromBottomOf: aRectangle to: anotherRectangle.
 	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
 	middle := p1 y + p2 y / 2.0.
@@ -606,7 +611,8 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toLeft: anot
 MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toRight: anotherRectangle do: aBlock [
 
 	| p1 p2 middle |
-	anotherRectangle right < aRectangle left ifFalse: [ ^ self ].
+	anotherRectangle right + self horizontalGap < aRectangle left
+		ifFalse: [ ^ self ].
 	p1 := self attachPointFromLeftOf: aRectangle to: anotherRectangle.
 	p2 := self attachPointFromRightOf: anotherRectangle to: aRectangle.
 	middle := p1 x + p2 x / 2.0.
@@ -621,8 +627,10 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toRight: ano
 MicroUMLRoassalBuilder >> possibleControlPointsFromLeft: aRectangle toTop: anotherRectangle do: aBlock [
 
 	| p1 p2 |
-	anotherRectangle center x <= aRectangle left ifFalse: [ ^ self ].
-	aRectangle center y <= anotherRectangle top ifFalse: [ ^ self ].
+	anotherRectangle center x + self horizontalGap <= aRectangle left
+		ifFalse: [ ^ self ].
+	aRectangle center y + self verticalGap <= anotherRectangle top
+		ifFalse: [ ^ self ].
 	p1 := self attachPointFromLeftOf: aRectangle to: anotherRectangle.
 	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
 	aBlock value: {
@@ -672,8 +680,10 @@ MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toRight: an
 MicroUMLRoassalBuilder >> possibleControlPointsFromRight: aRectangle toTop: anotherRectangle do: aBlock [
 
 	| p1 p2 |
-	aRectangle right <= anotherRectangle center x ifFalse: [ ^ self ].
-	aRectangle center y <= anotherRectangle top ifFalse: [ ^ self ].
+	aRectangle right + self horizontalGap <= anotherRectangle center x
+		ifFalse: [ ^ self ].
+	aRectangle center y + self verticalGap <= anotherRectangle top
+		ifFalse: [ ^ self ].
 	p1 := self attachPointFromRightOf: aRectangle to: anotherRectangle.
 	p2 := self attachPointFromTopOf: anotherRectangle to: aRectangle.
 	aBlock value: {
