@@ -80,7 +80,7 @@ MicroUMLEditor >> drawDiagram [
 		       ifNotEmpty: [ self compileUml ].
 
 	builder classDiagramNode: uml diagram.
-	builder canvas clear.
+	builder canvas shapes copy do: [ :shape | shape remove ].
 	builder build.
 	builder canvas @ RSCanvasController.
 	builder container signalUpdate
