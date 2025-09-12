@@ -8,7 +8,7 @@ Class {
 	#package : 'MicroUML-Generator'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'instance creation' }
 MicroUMLCodeGenerator class >> forDiagram: aDiagram [
 
 	^ self new
@@ -16,25 +16,27 @@ MicroUMLCodeGenerator class >> forDiagram: aDiagram [
 		yourself
 ]
 
-{ #category : 'as yet unclassified' }
-MicroUMLCodeGenerator >> classesInOrderOfInheritance [
-	"Superclasses should appear before their subclasses"
-	
-	| classes orderedClasses classesToAdd |
-	
-	classes := OrderedCollection withAll: diagram classes.
-	orderedClasses := OrderedCollection new.
-	
-	[ classes isEmpty ] whileFalse: [
-		classesToAdd := classes reject: [ :each |
-			classes anySatisfy: [ :aClass | each superclass = aClass name ] ].
-		
-		orderedClasses addAll: classesToAdd.
-		classes removeAll: classesToAdd ].
-	
-	^ orderedClasses
-	
-	
+{ #category : 'testing' }
+MicroUMLCodeGenerator >> checkConsistencyWithExistingClassesAndTraits [
+
+	diagram classesDo: [ :classNode |
+			(self checkConsistencyWithExistingClassesAndTraits: classNode)
+				ifFalse: [ ^ false ] ].
+	^ true
+]
+
+{ #category : 'testing' }
+MicroUMLCodeGenerator >> checkConsistencyWithExistingClassesAndTraits: aMicroUMLClassNode [
+
+	Smalltalk globals
+		at: aMicroUMLClassNode name
+		ifPresent: [ :pharoGlobal |
+				(aMicroUMLClassNode isTrait not xor: [ pharoGlobal isTrait ])
+					ifFalse: [
+							^ MicroUMLCodeGenerationInconsistency
+								  signalUmlClass: aMicroUMLClassNode
+								  pharoClass: pharoGlobal ] ].
+	^ true
 ]
 
 { #category : 'accessing' }
@@ -49,57 +51,80 @@ MicroUMLCodeGenerator >> diagram: aMicroUmlDiagram [
 	diagram := aMicroUmlDiagram 
 ]
 
-{ #category : 'as yet unclassified' }
-MicroUMLCodeGenerator >> ensureSuperclasses [
-	"A diagram like this: #Cat --|> #Animal is valid even if Animal class is not defined. But to generate a Cat class, the Animal must be generated as well.
-	
-	This method checks all superclasses and if they don't exist neither in the environment (Pharo image) nor in the UML definition, it adds them to the UML as subclasses of Object.
-	
-	It also replacess all nil superclasses with Object"
+{ #category : 'private' }
+MicroUMLCodeGenerator >> ensureClass: aSymbol inPackageNamed: aPackageName [
 
-	diagram classes do: [ :each |
-			each superclass ifNil: [ each superclass: #Object ].
-			diagram ensureClassNamed: each superclass ]
+	^ aSymbol
+		  ifNotNil: [
+				  Smalltalk globals
+					  at: aSymbol asSymbol
+					  ifAbsent: [
+					  (Object << aSymbol asSymbol package: aPackageName) install ] ]
+		  ifNil: [ Object ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'private' }
+MicroUMLCodeGenerator >> ensureTrait: aSymbol inPackageNamed: aPackageName [
+
+	^ aSymbol
+		  ifNotNil: [
+				  Smalltalk globals
+					  at: aSymbol asSymbol
+					  ifAbsent: [
+					  (Trait << aSymbol asSymbol package: aPackageName) install ] ]
+		  ifNil: [ Trait ]
+]
+
+{ #category : 'generating' }
 MicroUMLCodeGenerator >> generateClass: umlClassNode inPackageNamed: aPackageName [
 
-	| superclass newClass instanceVariableNames classSideVariables |
-	
-	superclass := umlClassNode superclass.
-	
-	superclass isString ifTrue: [
-		superclass := self class environment classNamed: superclass ]. 
-	
+	| superclass traits newClass instanceVariableNames classSideVariables |
+	superclass := umlClassNode isTrait
+		              ifTrue: [
+			              self
+				              ensureTrait: umlClassNode superclass
+				              inPackageNamed: aPackageName ]
+		              ifFalse: [
+			              self
+				              ensureClass: umlClassNode superclass
+				              inPackageNamed: aPackageName ].
+
+	traits := umlClassNode traits collect: [ :name |
+		          self ensureTrait: name inPackageNamed: aPackageName ].
+
 	instanceVariableNames := umlClassNode attributes
-		reject: [ :each | each isClassSide ]
-		thenCollect: [ :each | each name ].
-		
+		                         reject: [ :each | each isClassSide ]
+		                         thenCollect: [ :each | each name ].
+
 	classSideVariables := umlClassNode attributes
-		select: [ :each | each isClassSide ]
-		thenCollect: [ :each | each name ].
-	
-	newClass := (superclass << umlClassNode name asSymbol
-		slots: instanceVariableNames;
-		classSlots: classSideVariables;
-		package: aPackageName) install.
-		
+		                      select: [ :each | each isClassSide ]
+		                      thenCollect: [ :each | each name ].
+
+	newClass := ((superclass << umlClassNode name asSymbol)
+		             traits: traits;
+		             slots: instanceVariableNames;
+		             classSlots: classSideVariables;
+		             package: aPackageName) install.
+
 	self generateMethodsOfClass: newClass from: umlClassNode
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'generating' }
 MicroUMLCodeGenerator >> generateClassesInPackageNamed: aPackageName [
 
-	self ensureSuperclasses.
-
-	self classesInOrderOfInheritance do: [ :umlClassNode |
-		"Don't generate classes that already exist in the system"
-		(self class environment hasClassNamed: umlClassNode name) ifFalse: [ 
-			self generateClass: umlClassNode inPackageNamed: aPackageName ] ].
+	| agenda |
+	self checkConsistencyWithExistingClassesAndTraits.
+	agenda := OrderedCollection withAll: diagram classes.
+	[ agenda notEmpty ] whileTrue: [
+			| classNode |
+			classNode := agenda
+				             detect: [ :node | self isReadyToGenerateClass: node ]
+				             ifNone: [ ^ self error: 'Cyclic inheritance?' ].
+			agenda remove: classNode.
+			self generateClass: classNode inPackageNamed: aPackageName ]
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'generating' }
 MicroUMLCodeGenerator >> generateMethod: umlMethodNode inClass: aClass [
 	
 	| sourceCode method |
@@ -120,7 +145,7 @@ MicroUMLCodeGenerator >> generateMethod: umlMethodNode inClass: aClass [
 	
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'generating' }
 MicroUMLCodeGenerator >> generateMethodsOfClass: aClass from: umlClassNode [
 
 	| instanceSideMethods classSideMethods |
@@ -130,6 +155,27 @@ MicroUMLCodeGenerator >> generateMethodsOfClass: aClass from: umlClassNode [
 	
 	instanceSideMethods do: [ :method | self generateMethod: method inClass: aClass ].
 	classSideMethods do: [ :method | self generateMethod: method inClass: aClass class ]
+]
+
+{ #category : 'testing' }
+MicroUMLCodeGenerator >> isReadyToGenerateClass: aMicroUMLClassNode [
+
+	(self checkConsistencyWithExistingClassesAndTraits:
+		 aMicroUMLClassNode) ifFalse: [ ^ false ].
+	aMicroUMLClassNode superclass ifNotNil: [ :superclassName |
+			Smalltalk globals
+				at: superclassName
+				ifPresent: [ :superclass |
+						(aMicroUMLClassNode isTrait not xor: [
+							 superclass = Trait or: [ superclass isTrait ] ]) ifFalse: [
+							^ false ] ]
+				ifAbsent: [ ^ (diagram hasClassNamed: superclassName) not ] ].
+	aMicroUMLClassNode traitsDo: [ :traitName |
+			Smalltalk globals
+				at: traitName
+				ifPresent: [ :trait | trait isTrait ifFalse: [ ^ false ] ]
+				ifAbsent: [ ^ (diagram hasClassNamed: traitName) not ] ].
+	^ true
 ]
 
 { #category : 'printing' }

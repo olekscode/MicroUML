@@ -107,7 +107,7 @@ MicroUMLMermaidGenerator >> generateClass: aMicroUMLClassNode into: aStream [
 	aStream
 		nextPutAll: 'class ';
 		nextPutAll: aMicroUMLClassNode name;
-		nextPutAll: ' {';
+		nextPutAll: ' { ';
 		cr.
 	aMicroUMLClassNode isAbstract ifTrue: [
 			aStream
