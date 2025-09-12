@@ -10,19 +10,19 @@ Class {
 	#package : 'MicroUML-Tests'
 }
 
-{ #category : 'as yet unclassified' }
+{ #category : 'utilities' }
 MicroUMLCodeGeneratorTest >> doesClassExist: aClassName [
 
 	^ self class environment hasClassNamed: aClassName 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'utilities' }
 MicroUMLCodeGeneratorTest >> doesPackageExist: aPackageName [
 
 	^ self packageOrganizer hasPackage: aPackageName 
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'utilities' }
 MicroUMLCodeGeneratorTest >> exampleUML [
 	<script: 'self new exampleUML inspect'>
 	
@@ -58,25 +58,6 @@ MicroUMLCodeGeneratorTest >> tearDown [
 		self packageOrganizer removePackage: packageName ].
 	
 	super tearDown
-]
-
-{ #category : 'tests' }
-MicroUMLCodeGeneratorTest >> testClassesInOrderOfInheritance [
-
-	| expectedClassNames actualClassNames |
-	
-	expectedClassNames := #(Animal__ Cat__ Dog__ GermanShepherd__) asOrderedCollection.
-	actualClassNames := generator classesInOrderOfInheritance collect: [ :each | each name ].
-
-	self assert: actualClassNames equals: expectedClassNames
-]
-
-{ #category : 'tests' }
-MicroUMLCodeGeneratorTest >> testEnsureSuperclasses [
-
-	self deny: (generator diagram hasClassNamed: #Object__).
-	generator ensureSuperclasses.
-	self assert: (generator diagram hasClassNamed: #Object__)
 ]
 
 { #category : 'tests' }
@@ -121,4 +102,18 @@ MicroUMLCodeGeneratorTest >> testGenerateInstanceVariables [
 	animalClass := self class environment classNamed: #Animal__.
 	
 	self assert: animalClass slotNames equals: #(name age).
+]
+
+{ #category : 'tests' }
+MicroUMLCodeGeneratorTest >> testIsReadyToGenerateClass [
+
+	| animal cat |
+	animal := uml classAt: #Animal__.
+	cat := uml classAt: #Cat__.
+	self assert: (generator isReadyToGenerateClass: animal).
+	animal superclass: #Object.
+	self assert: (generator isReadyToGenerateClass: animal).
+	self deny: (generator isReadyToGenerateClass: cat).
+	cat superclass: nil.
+	self assert: (generator isReadyToGenerateClass: cat)
 ]

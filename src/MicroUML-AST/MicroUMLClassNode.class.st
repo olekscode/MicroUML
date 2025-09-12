@@ -147,6 +147,12 @@ MicroUMLClassNode >> isMicroUMLClassNode [
 ]
 
 { #category : 'accessing' }
+MicroUMLClassNode >> isTrait [
+
+	^ isTrait
+]
+
+{ #category : 'accessing' }
 MicroUMLClassNode >> keywords [
 
 	^ Array streamContents: [ :stream |
