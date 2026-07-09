@@ -1,5 +1,5 @@
 Class {
-	#name : 'MicroUMLAstNodeInteraction',
+	#name : 'MicroUMLBrowserNodeInteraction',
 	#superclass : 'RSInteraction',
 	#instVars : [
 		'box'
@@ -9,7 +9,7 @@ Class {
 }
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuFor: aRSShape [
+MicroUMLBrowserNodeInteraction >> contextMenuFor: aRSShape [
 
 	aRSShape model ifNotNil: [ :model |
 			(model isKindOf: MicroUMLClassNode) ifTrue: [
@@ -24,7 +24,7 @@ MicroUMLAstNodeInteraction >> contextMenuFor: aRSShape [
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForAssociationNode: aMicroUMLAssociationNode [
+MicroUMLBrowserNodeInteraction >> contextMenuForAssociationNode: aMicroUMLAssociationNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLAssociationNode leftClass , ' - '
@@ -119,7 +119,7 @@ MicroUMLAstNodeInteraction >> contextMenuForAssociationNode: aMicroUMLAssociatio
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForAttributeNode: aMicroUMLAttributeNode [
+MicroUMLBrowserNodeInteraction >> contextMenuForAttributeNode: aMicroUMLAttributeNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLAttributeNode name;
@@ -194,7 +194,7 @@ MicroUMLAstNodeInteraction >> contextMenuForAttributeNode: aMicroUMLAttributeNod
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForClassNode: aMicroUMLClassNode [
+MicroUMLBrowserNodeInteraction >> contextMenuForClassNode: aMicroUMLClassNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLClassNode name;
@@ -349,7 +349,7 @@ MicroUMLAstNodeInteraction >> contextMenuForClassNode: aMicroUMLClassNode [
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForMethodNode: aMicroUMLMethodNode [
+MicroUMLBrowserNodeInteraction >> contextMenuForMethodNode: aMicroUMLMethodNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLMethodNode name;
@@ -440,7 +440,7 @@ MicroUMLAstNodeInteraction >> contextMenuForMethodNode: aMicroUMLMethodNode [
 ]
 
 { #category : 'event handling' }
-MicroUMLAstNodeInteraction >> mouseEnter: event [
+MicroUMLBrowserNodeInteraction >> mouseEnter: event [
 
 	event shape encompassingRectangle ifNotNil: [ :rect |
 			box ifNotNil: #remove.
@@ -459,7 +459,7 @@ MicroUMLAstNodeInteraction >> mouseEnter: event [
 ]
 
 { #category : 'event handling' }
-MicroUMLAstNodeInteraction >> mouseLeave: event [
+MicroUMLBrowserNodeInteraction >> mouseLeave: event [
 
 	box ifNotNil: #remove.
 	box := nil.
@@ -467,7 +467,7 @@ MicroUMLAstNodeInteraction >> mouseLeave: event [
 ]
 
 { #category : 'hooks' }
-MicroUMLAstNodeInteraction >> onShape: aShape [
+MicroUMLBrowserNodeInteraction >> onShape: aShape [
 	"opens my context menu with a right click."
 
 	aShape
