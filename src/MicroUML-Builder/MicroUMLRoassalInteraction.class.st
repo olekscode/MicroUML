@@ -3,7 +3,7 @@ Class {
 	#superclass : 'RSInteraction',
 	#instVars : [
 		'shape',
-		'box'
+		'commentBox'
 	],
 	#category : 'MicroUML-Builder',
 	#package : 'MicroUML-Builder'
@@ -450,10 +450,10 @@ MicroUMLRoassalInteraction >> mouseClick: event [
 { #category : 'event handling' }
 MicroUMLRoassalInteraction >> mouseEnter: event [
 
-	(box notNil and: [ shape == event shape ]) ifTrue: [ ^ self ].
+	(commentBox notNil and: [ shape == event shape ]) ifTrue: [ ^ self ].
 	shape := event shape.
-	box ifNotNil: #remove.
-	box := nil.
+	commentBox ifNotNil: #remove.
+	commentBox := nil.
 	event shape model ifNotNil: [ :node |
 			node comment ifNotNil: [ :comment |
 					| label |
@@ -461,7 +461,7 @@ MicroUMLRoassalInteraction >> mouseEnter: event [
 						         text: comment;
 						         color: Color black;
 						         yourself.
-					box := (RSGroup new
+					commentBox := (RSGroup new
 						        add: (RSBox new
 								         color: Color white;
 								         fromRectangle:
@@ -471,10 +471,10 @@ MicroUMLRoassalInteraction >> mouseEnter: event [
 										          color: Color black));
 						        add: label;
 						        yourself) asShape.
-					box translateTo:
+					commentBox translateTo:
 						event positionFromCamera
-						+ (box encompassingRectangle right + 10 @ 0).
-					event canvas addShape: box.
+						+ (commentBox encompassingRectangle right + 10 @ 0).
+					event canvas addShape: commentBox.
 					event canvas signalUpdate ] ]
 ]
 
@@ -484,8 +484,8 @@ MicroUMLRoassalInteraction >> mouseLeave: event [
 	(shape notNil and: [
 		 shape encompassingRectangle containsPoint: event positionFromCamera ])
 		ifTrue: [ ^ self ].
-	box ifNotNil: #remove.
-	box := nil.
+	commentBox ifNotNil: #remove.
+	commentBox := nil.
 	shape := nil.
 	event canvas signalUpdate
 ]

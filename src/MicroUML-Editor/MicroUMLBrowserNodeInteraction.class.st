@@ -454,7 +454,7 @@ MicroUMLBrowserNodeInteraction >> mouseEnter: event [
 				       width: 5;
 				       color: UITheme current selectionColor;
 				       yourself.
-			event shape parent add: box.
+			event shape parent add: box; pushBack: box.
 			event canvas signalUpdate ]
 ]
 
