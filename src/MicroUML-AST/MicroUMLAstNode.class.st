@@ -1,9 +1,25 @@
 Class {
 	#name : 'MicroUMLAstNode',
 	#superclass : 'Object',
+	#instVars : [
+		'comment',
+		'actionBlock'
+	],
 	#category : 'MicroUML-AST',
 	#package : 'MicroUML-AST'
 }
+
+{ #category : 'accessing' }
+MicroUMLAstNode >> actionBlock [
+
+	^ actionBlock
+]
+
+{ #category : 'accessing' }
+MicroUMLAstNode >> actionBlock: aBlock [
+
+	actionBlock := aBlock
+]
 
 { #category : 'icons' }
 MicroUMLAstNode >> addIcon [
@@ -29,6 +45,18 @@ MicroUMLAstNode >> children [
 	^ OrderedCollection empty
 ]
 
+{ #category : 'accessing' }
+MicroUMLAstNode >> comment [
+
+	^ comment
+]
+
+{ #category : 'accessing' }
+MicroUMLAstNode >> comment: aString [
+
+	comment := aString
+]
+
 { #category : 'dialog' }
 MicroUMLAstNode >> confirm: aString [
 
@@ -50,7 +78,7 @@ MicroUMLAstNode >> iconNamed: aSymbol [
 	^ self application iconNamed: aSymbol
 ]
 
-{ #category : 'as yet unclassified' }
+{ #category : 'inspecting' }
 MicroUMLAstNode >> inspectionAST: aBuilder [
 	<inspectorPresentationOrder: 35 title: 'AST'>
 

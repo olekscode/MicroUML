@@ -1,15 +1,16 @@
 Class {
-	#name : 'MicroUMLAstNodeInteraction',
+	#name : 'MicroUMLRoassalInteraction',
 	#superclass : 'RSInteraction',
 	#instVars : [
-		'box'
+		'shape',
+		'commentBox'
 	],
-	#category : 'MicroUML-Editor',
-	#package : 'MicroUML-Editor'
+	#category : 'MicroUML-Builder',
+	#package : 'MicroUML-Builder'
 }
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuFor: aRSShape [
+MicroUMLRoassalInteraction >> contextMenuFor: aRSShape [
 
 	aRSShape model ifNotNil: [ :model |
 			(model isKindOf: MicroUMLClassNode) ifTrue: [
@@ -24,7 +25,7 @@ MicroUMLAstNodeInteraction >> contextMenuFor: aRSShape [
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForAssociationNode: aMicroUMLAssociationNode [
+MicroUMLRoassalInteraction >> contextMenuForAssociationNode: aMicroUMLAssociationNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLAssociationNode leftClass , ' - '
@@ -119,7 +120,7 @@ MicroUMLAstNodeInteraction >> contextMenuForAssociationNode: aMicroUMLAssociatio
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForAttributeNode: aMicroUMLAttributeNode [
+MicroUMLRoassalInteraction >> contextMenuForAttributeNode: aMicroUMLAttributeNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLAttributeNode name;
@@ -194,7 +195,7 @@ MicroUMLAstNodeInteraction >> contextMenuForAttributeNode: aMicroUMLAttributeNod
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForClassNode: aMicroUMLClassNode [
+MicroUMLRoassalInteraction >> contextMenuForClassNode: aMicroUMLClassNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLClassNode name;
@@ -349,7 +350,7 @@ MicroUMLAstNodeInteraction >> contextMenuForClassNode: aMicroUMLClassNode [
 ]
 
 { #category : 'menus' }
-MicroUMLAstNodeInteraction >> contextMenuForMethodNode: aMicroUMLMethodNode [
+MicroUMLRoassalInteraction >> contextMenuForMethodNode: aMicroUMLMethodNode [
 
 	^ SpMenuPresenter new
 		  title: aMicroUMLMethodNode name;
@@ -440,41 +441,61 @@ MicroUMLAstNodeInteraction >> contextMenuForMethodNode: aMicroUMLMethodNode [
 ]
 
 { #category : 'event handling' }
-MicroUMLAstNodeInteraction >> mouseEnter: event [
+MicroUMLRoassalInteraction >> mouseClick: event [
 
-	event shape encompassingRectangle ifNotNil: [ :rect |
-			box ifNotNil: #remove.
-			box := RSPolyline new
-				       controlPoints: {
-						       rect topLeft.
-						       rect topRight.
-						       rect bottomRight.
-						       rect bottomLeft.
-						       rect topLeft };
-				       width: 5;
-				       color: UITheme current selectionColor;
-				       yourself.
-			event shape parent add: box.
-			event canvas signalUpdate ]
+	event shape model ifNotNil: [ :model |
+		model actionBlock ifNotNil: [ :action | action cull: model ] ]
 ]
 
 { #category : 'event handling' }
-MicroUMLAstNodeInteraction >> mouseLeave: event [
+MicroUMLRoassalInteraction >> mouseEnter: event [
 
-	box ifNotNil: #remove.
-	box := nil.
+	(commentBox notNil and: [ shape == event shape ]) ifTrue: [ ^ self ].
+	shape := event shape.
+	commentBox ifNotNil: #remove.
+	commentBox := nil.
+	event shape model ifNotNil: [ :node |
+			node comment ifNotNil: [ :comment |
+					| label |
+					label := RSLabel new
+						         text: comment;
+						         color: Color black;
+						         yourself.
+					commentBox := (RSGroup new
+						        add: (RSBox new
+								         color: Color white;
+								         fromRectangle:
+									         (label encompassingRectangle expandBy: 4);
+								         border: (RSBorder new
+										          width: 2;
+										          color: Color black));
+						        add: label;
+						        yourself) asShape.
+					commentBox translateTo:
+						event positionFromCamera
+						+ (commentBox encompassingRectangle right + 10 @ 0).
+					event canvas addShape: commentBox.
+					event canvas signalUpdate ] ]
+]
+
+{ #category : 'event handling' }
+MicroUMLRoassalInteraction >> mouseLeave: event [
+
+	(shape notNil and: [
+		 shape encompassingRectangle containsPoint: event positionFromCamera ])
+		ifTrue: [ ^ self ].
+	commentBox ifNotNil: #remove.
+	commentBox := nil.
+	shape := nil.
 	event canvas signalUpdate
 ]
 
 { #category : 'hooks' }
-MicroUMLAstNodeInteraction >> onShape: aShape [
+MicroUMLRoassalInteraction >> onShape: aShape [
 	"opens my context menu with a right click."
 
 	aShape
-		when: RSMouseRightClick do: [ :evt |
-				(self contextMenuFor: evt shape) ifNotNil: [ :menu |
-						menu openWithSpecAtPointer ] ]
-		for: self;
+		when: RSMouseClick do: [ :evt | self mouseClick: evt ] for: self;
 		when: RSMouseLeave do: [ :evt | self mouseLeave: evt ] for: self;
 		when: RSMouseEnter do: [ :evt | self mouseEnter: evt ] for: self
 ]

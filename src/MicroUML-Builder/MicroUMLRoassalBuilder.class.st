@@ -8,7 +8,8 @@ Class {
 	#instVars : [
 		'classDiagramNode',
 		'nodes',
-		'colorBlock'
+		'colorBlock',
+		'interaction'
 	],
 	#category : 'MicroUML-Builder',
 	#package : 'MicroUML-Builder'
@@ -44,6 +45,105 @@ MicroUMLRoassalBuilder class >> exampleSerie2 [
 MicroUMLRoassalBuilder >> associationEdgeColor [
 
 	^ Color lightGray
+]
+
+{ #category : 'private' }
+MicroUMLRoassalBuilder >> attachInteraction: aRSShape [
+
+	aRSShape model ifNotNil: [ :model |
+			(model comment notNil or: [ model actionBlock notNil ]) ifTrue: [
+				aRSShape @ interaction ] ]
+]
+
+{ #category : 'instance creation' }
+MicroUMLRoassalBuilder >> basicNewClassBoxFor: aMicroUMLClassNode [
+
+	| color myLabel attributeShapes methodShapes memberShapes rect y1 y2 |
+	color := self colorFor: aMicroUMLClassNode.
+	myLabel := Array streamContents: [ :stream |
+			           | label |
+			           aMicroUMLClassNode keywordsDo: [ :keyword |
+					           stream nextPut: (RSLabel new
+							            text: '<<' , keyword , '>>';
+							            color: Color darkGray) ].
+			           label := RSLabel new
+				                    text: aMicroUMLClassNode name;
+				                    color: color.
+			           aMicroUMLClassNode isAbstract ifTrue: [ label italic ].
+			           stream nextPut: label ].
+	RSVerticalLineLayout new
+		alignCenter;
+		on: myLabel.
+	myLabel := myLabel asShape.
+	myLabel extent x < 100 ifTrue: [
+		myLabel extent: 100 @ myLabel extent y ].
+	aMicroUMLClassNode isEmptyDefinition
+		ifTrue: [
+				^ {
+					  (RSBox new
+						   extent: myLabel extent + (10 @ 6);
+						   position: myLabel position;
+						   color: Color white;
+						   borderColor: color;
+						   borderWidth: 1).
+					  myLabel } asShapeFor: aMicroUMLClassNode ]
+		ifFalse: [
+				attributeShapes := aMicroUMLClassNode attributesCollect: [
+					                   :attribute |
+					                   self newMemberLabelFor: attribute ].
+				RSVerticalLineLayout new
+					alignLeft;
+					on: attributeShapes.
+				attributeShapes := attributeShapes asShape.
+
+
+				methodShapes := aMicroUMLClassNode methodsCollect: [ :method |
+					                self newMemberLabelFor: method ].
+				RSVerticalLineLayout new
+					alignLeft;
+					on: methodShapes.
+				methodShapes := methodShapes asShape.
+
+				RSVerticalLineLayout new
+					alignLeft;
+					gapSize: 10;
+					on: {
+							attributeShapes.
+							methodShapes }.
+				memberShapes := {
+					                attributeShapes.
+					                methodShapes } asShape.
+
+				myLabel extent x < memberShapes extent x ifTrue: [
+					myLabel extent: memberShapes extent x @ myLabel extent y ].
+				RSVerticalLineLayout new
+					alignLeft;
+					gapSize: 10;
+					on: {
+							myLabel.
+							memberShapes }.
+				rect := {
+					        myLabel.
+					        memberShapes } asShape encompassingRectangle.
+				y1 := myLabel encompassingRectangle bottom + 5.
+				y2 := y1 + attributeShapes encompassingRectangle height + 10.
+
+				^ {
+					  (RSBox new
+						   extent: rect extent + (10 @ 6);
+						   color: Color white;
+						   borderColor: color;
+						   borderWidth: 1).
+					  (RSLine new
+						   startPoint: rect extent x / -2 - 5 @ y1;
+						   endPoint: rect extent x / 2 + 5 @ y1;
+						   color: color).
+					  (RSLine new
+						   startPoint: rect extent x / -2 - 5 @ y2;
+						   endPoint: rect extent x / 2 + 5 @ y2;
+						   color: color).
+					  myLabel.
+					  memberShapes } asShapeFor: aMicroUMLClassNode ]
 ]
 
 { #category : 'accessing' }
@@ -100,97 +200,17 @@ MicroUMLRoassalBuilder >> inheritanceEdgeColor [
 MicroUMLRoassalBuilder >> initialize [
 
 	super initialize.
-	nodes := Dictionary new
+	nodes := Dictionary new.
+	interaction := MicroUMLRoassalInteraction new
 ]
 
 { #category : 'instance creation' }
 MicroUMLRoassalBuilder >> newClassBoxFor: aMicroUMLClassNode [
 
-	| color myLabel attributeShapes methodShapes memberShapes rect y1 y2 |
-	color := self colorFor: aMicroUMLClassNode.
-	myLabel := Array streamContents: [ :stream |
-			           | label |
-			           aMicroUMLClassNode keywordsDo: [ :keyword |
-					           stream nextPut: (RSLabel new
-							            text: '<<' , keyword , '>>';
-							            color: Color darkGray) ].
-			           label := RSLabel new
-				                    text: aMicroUMLClassNode name;
-				                    color: color.
-			           aMicroUMLClassNode isAbstract ifTrue: [ label italic ].
-			           stream nextPut: label ].
-	RSVerticalLineLayout new
-		alignCenter;
-		on: myLabel.
-	myLabel := myLabel asShape.
-	myLabel extent x < 100 ifTrue: [
-		myLabel extent: 100 @ myLabel extent y ].
-	aMicroUMLClassNode isEmptyDefinition
-		ifTrue: [
-				^ {
-					  (RSBox new
-						   extent: myLabel extent + (10 @ 6);
-						   position: myLabel position;
-						   color: Color white;
-						   borderColor: color;
-						   borderWidth: 1).
-					  myLabel } asShapeFor: aMicroUMLClassNode ]
-		ifFalse: [
-				attributeShapes := aMicroUMLClassNode attributesCollect: [
-					                   :attribute |
-					                   self newMemberLabelFor: attribute ].
-				RSVerticalLineLayout new
-					alignLeft;
-					on: attributeShapes.
-				attributeShapes := attributeShapes asShape.
-
-				methodShapes := aMicroUMLClassNode methodsCollect: [ :method |
-					                self newMemberLabelFor: method ].
-				RSVerticalLineLayout new
-					alignLeft;
-					on: methodShapes.
-				methodShapes := methodShapes asShape.
-
-				RSVerticalLineLayout new
-					alignLeft;
-					gapSize: 10;
-					on: {
-							attributeShapes.
-							methodShapes }.
-				memberShapes := {
-					                attributeShapes.
-					                methodShapes } asShape.
-
-				myLabel extent x < memberShapes extent x ifTrue: [
-					myLabel extent: memberShapes extent x @ myLabel extent y ].
-				RSVerticalLineLayout new
-					alignLeft;
-					gapSize: 10;
-					on: {
-							myLabel.
-							memberShapes }.
-				rect := {
-					        myLabel.
-					        memberShapes } asShape encompassingRectangle.
-				y1 := myLabel encompassingRectangle bottom + 5.
-				y2 := y1 + attributeShapes encompassingRectangle height + 10.
-
-				^ {
-					  (RSBox new
-						   extent: rect extent + (10 @ 6);
-						   color: Color white;
-						   borderColor: color;
-						   borderWidth: 1).
-					  (RSLine new
-						   startPoint: rect extent x / -2 - 5 @ y1;
-						   endPoint: rect extent x / 2 + 5 @ y1;
-						   color: color).
-					  (RSLine new
-						   startPoint: rect extent x / -2 - 5 @ y2;
-						   endPoint: rect extent x / 2 + 5 @ y2;
-						   color: color).
-					  myLabel.
-					  memberShapes } asShapeFor: aMicroUMLClassNode ]
+	| box |
+	box := self basicNewClassBoxFor: aMicroUMLClassNode.
+	self attachInteraction: box.
+	^ box
 ]
 
 { #category : 'instance creation' }
@@ -206,6 +226,7 @@ MicroUMLRoassalBuilder >> newEdgeFor: aMicroUMLAssociationNode [
 			          (self newMarkerFor: aMicroUMLAssociationNode rightHead);
 		          yourself.
 	aMicroUMLAssociationNode line = #dashed ifTrue: [ bazier dashed ].
+	self attachInteraction: bazier.
 	^ bazier
 ]
 
@@ -305,6 +326,7 @@ MicroUMLRoassalBuilder >> newMemberLabelFor: aMicroUMLMemberNode [
 		label emphasis: TextEmphasis italic ].
 	aMicroUMLMemberNode isClassSide ifTrue: [
 		label emphasis: TextEmphasis underlined ].
+	self attachInteraction: label.
 	^ label
 ]
 

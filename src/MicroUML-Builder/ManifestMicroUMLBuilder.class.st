@@ -8,3 +8,10 @@ Class {
 	#package : 'MicroUML-Builder',
 	#tag : 'Manifest'
 }
+
+{ #category : 'code-critics' }
+ManifestMicroUMLBuilder class >> ruleThreeElementPointRuleV1FalsePositive [
+
+	<ignoreForCoverage>
+	^ #(#(#(#RGMethodDefinition #(#'MicroUMLAstBuilder class' #exampleSerie #true)) #'2026-07-09T15:25:17.240565+03:00') #(#(#RGMethodDefinition #(#'MicroUMLAstBuilder class' #exampleSerie2 #true)) #'2026-07-09T15:25:26.141484+03:00') )
+]

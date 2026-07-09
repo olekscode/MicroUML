@@ -1,53 +1,64 @@
 "
-I build a UML class diagram.
-I have a namespace of classes to manage class definitions, references and relations among them.
-You can use me explicitly say, like
+# Class Comment for MicroUMLAstBuilder
 
-```MicroUML
-MicroUMLBuilder
-===
-MyClass
-    ++att1@ #int
+## Purpose and Role in the System
+
+The `MicroUMLAstBuilder` class is a critical component within the MicroUML framework, designed to construct abstract syntax trees (ASTs) for UML class diagrams. It serves as a builder that interprets textual descriptions of UML classes and their relationships, transforming them into structured nodes that can be rendered into visual diagrams. This builder is essential for developers who need to generate UML diagrams programmatically or through textual specifications, facilitating the creation of clear and consistent class diagrams without manual drawing.
+
+## Main Collaborators or Dependencies
+
+The `MicroUMLAstBuilder` collaborates closely with several other classes within the MicroUML framework:
+
+- **MicroUMLClassNode**: Represents individual classes in the UML diagram, including their attributes, methods, and modifiers.
+- **MicroUMLAssociationNode**: Represents relationships between classes, such as associations, aggregations, compositions, and dependencies.
+- **MicroUMLClassDiagramNode**: Aggregates class and association nodes to form a complete diagram.
+- **MicroUMLRoassalBuilder**: Utilises the Roassal visualisation engine to render the UML diagram from the AST nodes.
+
+These collaborators work together to ensure that the textual specifications are accurately translated into visual representations.
+
+## Important Invariants or Design Constraints
+
+1. **Class and Association Management**: The builder maintains collections of classes and associations, ensuring that each class and association is uniquely identified and correctly linked.
+2. **Context Awareness**: The builder keeps track of the current class and association being processed, allowing it to apply modifiers and types appropriately.
+3. **Symbol Handling**: The builder handles symbols and strings uniformly, converting them into symbols for consistent processing and storage.
+4. **Error Handling**: The builder includes error handling for cases where invalid inputs are provided, such as non-string or non-class inputs for symbol conversion.
+
+## Illustrative Usage Examples
+
+### Example 1: Creating a Simple Class Diagram
+
+```smalltalk
+builder := MicroUMLAstBuilder new.
+builder === #Person.
+builder - #name @ #String.
+builder - #age @ #Integer.
+builder > #introduce ~ {}.
+builder === #Student.
+builder --|> #Person.
+builder - #studentId @ #String.
+builder > #study ~ {}.
+builder --> #Course.
+builder extent: 600 @ 400.
 ```
-but also imlicit ways, like
-```MicroUML
-#MyClass
-    ++att1 @ #int
+
+This example demonstrates how to create a simple UML diagram with two classes, `Person` and `Student`, where `Student` inherits from `Person` and has a dependency on `Course`.
+
+### Example 2: Creating a Diagram with Associations
+
+```smalltalk
+builder := MicroUMLAstBuilder new.
+builder === #Department.
+builder - #name @ #String.
+builder === #Employee.
+builder - #name @ #String.
+builder - #department @ #Department.
+builder <>-- #Department @ ('employs' -> 'employed by') %< '1..*' %> '1'.
+builder extent: 600 @ 400.
 ```
-or even like
-```MicroUML
-MyClass
-    ++att1 @ #int
-```
-if you actually have a class named `MyClass` in your system.
 
-The following is the summary of how you define a class.
+In this example, an aggregation relationship is established between `Employee` and `Department`, indicating that a department employs multiple employees, and each employee is employed by one department.
 
-```
-""Instance side variables""
-- #var1 ""protected by default""
-- #var2 % #public
-- #var3 % #private
-- #var4 % #protected
-
-""Class side variables""
-|- #var5 ""protected by default""
-|- #var6 % #public
-|- #var7 % #private
-|- #var8 % #protected
-
-""Instance side methods""
-> #method1 ""public by default""
-> #method2 % #public
-> #method3 % #private
-> #method4 % #protected
-
-""Class side methods""
-|> #method5 ""public by default""
-|> #method6 % #public
-|> #method7 % #private
-|> #method8 % #protected
-```
+By following these examples, developers can leverage the `MicroUMLAstBuilder` to create complex UML diagrams with ease, ensuring clarity and consistency in their design documentation.
 "
 Class {
 	#name : 'MicroUMLAstBuilder',
@@ -81,10 +92,12 @@ MicroUMLAstBuilder class >> exampleMicrodown [
 Example of novel and comic derrived from anime
 
 ```pharoscript
-#AbstractSeries 
-	- #name @ String 
-	- #numEpisodes @ Integer % #private
-	> #findByName % #abstract
+MU
+===
+#AbstractSeries // ''the base class of story published in series.''
+	- #name @ String // ''the title of the story''
+	- #numEpisodes @ Integer % #private // ''the number of episodes in the story''
+	> #findByName % #abstract // ''search by name''
 === 
 #NovelSeries 
 	--|> #AbstractSeries
@@ -118,10 +131,12 @@ extent: 600 @ 400
 MicroUMLAstBuilder class >> exampleSerie [
 
 	^ 
-#AbstractSeries 
-	- #name @ String 
-	- #numEpisodes @ Integer % #private
-	> #findByName % #abstract
+MU 
+===
+#AbstractSeries // 'the base class of story published in series.' + [ :ast | ast microUMLSource inspect ]
+	- #name @ String // 'the title of the story'
+	- #numEpisodes @ Integer % #private // 'the number of episodes in the story'
+	> #findByName % #abstract // 'search by name' + [ :ast | ast microUMLSource inspect ]
 === 
 #NovelSeries 
 	--|> #AbstractSeries
@@ -218,6 +233,18 @@ MicroUMLAstBuilder >> *=> aSymbolOrClass [
 		beDirected
 ]
 
+{ #category : 'UML - sapplementals' }
+MicroUMLAstBuilder >> + aBlock [
+
+	currentAssociation
+		ifNil: [
+				currentClass ifNil: [ ] ifNotNil: [
+						currentClass currentMember
+							ifNil: [ self addClassAction: aBlock ]
+							ifNotNil: [ self addMemberAction: aBlock ] ] ]
+		ifNotNil: [ self addAssociationAction: aBlock ]
+]
+
 { #category : 'UML - members' }
 MicroUMLAstBuilder >> - aSymbolOrArray [
 
@@ -246,6 +273,18 @@ MicroUMLAstBuilder >> --@ aSymbolOrClass [
 MicroUMLAstBuilder >> --|> aSymbolOrClass [
 
 	self addSuperclass: (self getSymbol: aSymbolOrClass)
+]
+
+{ #category : 'UML - sapplementals' }
+MicroUMLAstBuilder >> // aString [
+
+	currentAssociation
+		ifNil: [
+				currentClass ifNil: [ ] ifNotNil: [
+						currentClass currentMember
+							ifNil: [ self addClassComment: aString ]
+							ifNotNil: [ self addMemberComment: aString ] ] ]
+		ifNotNil: [ self addAssociationComment: aString ]
 ]
 
 { #category : 'UML - associations' }
@@ -304,6 +343,12 @@ MicroUMLAstBuilder >> @= aSymbolOrClass [
 	self addAssociationClass: (self getSymbol: aSymbolOrClass)
 ]
 
+{ #category : 'building - supplementals' }
+MicroUMLAstBuilder >> addAssociationAction: aBlock [
+
+	currentAssociation actionBlock: aBlock
+]
+
 { #category : 'building - associations' }
 MicroUMLAstBuilder >> addAssociationClass: aSymbol [
 
@@ -311,10 +356,28 @@ MicroUMLAstBuilder >> addAssociationClass: aSymbol [
 		(self ensureClassAt: aSymbol) name
 ]
 
+{ #category : 'building - supplementals' }
+MicroUMLAstBuilder >> addAssociationComment: aString [
+
+	currentAssociation comment: aString
+]
+
 { #category : 'building - associations' }
 MicroUMLAstBuilder >> addAssociationLabel: aStringOrAssociation [
 
 	currentAssociation addLabel: aStringOrAssociation
+]
+
+{ #category : 'building - supplementals' }
+MicroUMLAstBuilder >> addClassAction: aBlock [
+
+	currentClass actionBlock: aBlock
+]
+
+{ #category : 'building - supplementals' }
+MicroUMLAstBuilder >> addClassComment: aString [
+
+	currentClass comment: aString
 ]
 
 { #category : 'building - classes' }
@@ -327,6 +390,18 @@ MicroUMLAstBuilder >> addClassModifier: aSymbol [
 MicroUMLAstBuilder >> addLeftMultiplicity: aString [
 
 	currentAssociation leftMultiplicity: aString
+]
+
+{ #category : 'building - supplementals' }
+MicroUMLAstBuilder >> addMemberAction: aBlock [
+
+	currentClass currentMember actionBlock: aBlock
+]
+
+{ #category : 'building - supplementals' }
+MicroUMLAstBuilder >> addMemberComment: aString [
+
+	currentClass currentMember comment: aString
 ]
 
 { #category : 'building - members' }

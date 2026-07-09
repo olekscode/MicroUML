@@ -114,7 +114,7 @@ MicroUMLEditor >> drawDiagram [
 	builder classDiagramNode: diagram.
 	builder canvas shapes copy do: [ :shape | shape remove ].
 	builder build.
-	astNodeInteraction := MicroUMLAstNodeInteraction new.
+	astNodeInteraction := MicroUMLBrowserNodeInteraction new.
 	builder canvas allChildren do: [ :shape |
 		shape model isMicroUMLAstNode ifTrue: [ shape @ astNodeInteraction ] ].
 	builder canvas @ MicroUMLCanvasController.
