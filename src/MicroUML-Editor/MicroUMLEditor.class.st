@@ -117,7 +117,7 @@ MicroUMLEditor >> drawDiagram [
 	astNodeInteraction := MicroUMLBrowserNodeInteraction new.
 	builder canvas allChildren do: [ :shape |
 		shape model isMicroUMLAstNode ifTrue: [ shape @ astNodeInteraction ] ].
-	builder canvas @ MicroUMLCanvasController.
+	builder canvas @ (MicroUMLCanvasController new builder: builder).
 	builder canvas @ (MicroUMLClassDiagramNodeInteraction new
 		 diagram: diagram;
 		 yourself).
@@ -145,14 +145,19 @@ MicroUMLEditor >> generateClasses [
 	generator generateClassesInPackageNamed: self packageName
 ]
 
+{ #category : 'accessing' }
+MicroUMLEditor >> horizontalMargin [
+
+	^ builder
+]
+
 { #category : 'initialization' }
 MicroUMLEditor >> initializePresenters [
 
 	code := self newCode.
-	builder := MicroUMLRoassalBuilder new
-		           "colorBlock: [ :node | self colorFor: node ];"
-		           yourself.
-		
+	builder := MicroUMLRoassalBuilder new yourself.
+	"colorBlock: [ :node | self colorFor: node ];"
+
 	self drawDiagram.
 	preview := builder asPresenter.
 	toolbar := self newToolbar.
@@ -163,41 +168,40 @@ MicroUMLEditor >> initializePresenters [
 MicroUMLEditor >> initializeToolbar [
 
 	| drawButton |
-	
 	drawButton := self newToolbarButton
-		label: 'Draw';
-		icon: (self iconNamed: #go);
-		action: [ self drawDiagram ];
-		yourself.
+		              label: 'Draw';
+		              icon: (self iconNamed: #go);
+		              action: [ self drawDiagram ];
+		              yourself.
 
 	liveDrawingButton := self newToolbarToggleButton
-		label: 'Live';
-		icon: (self iconNamed: #autoReload);
-		whenActivatedDo: [
-			self drawDiagram.
-			drawButton disable ];
-		whenDeactivatedDo: [ drawButton enable ];
-		yourself.
+		                     label: 'Live';
+		                     icon: (self iconNamed: #autoReload);
+		                     whenActivatedDo: [
+				                     self drawDiagram.
+				                     drawButton disable ];
+		                     whenDeactivatedDo: [ drawButton enable ];
+		                     yourself.
 
 	toolbar add: drawButton.
 	toolbar add: liveDrawingButton.
 
-"	toolbar add: (self newToolbarButton
+	"	toolbar add: (self newToolbarButton
 			 label: 'Generate';
 			 icon: (self iconNamed: #smallNew);
 			 action: [ self generateClasses ];
 			 yourself)."
 
 	toolbar add: (self newToolbarButton
-		label: 'Save PNG';
-		icon: (self iconNamed: #smallScreenshot);
-		action: [ self saveAsPng ];
-		yourself).
+			 label: 'Save PNG';
+			 icon: (self iconNamed: #smallScreenshot);
+			 action: [ self saveAsPng ];
+			 yourself).
 
 	toolbar add: (self newToolbarButton
-		label: 'Inspect';
-		icon: (self iconNamed: #inspect);
-		action: [ self compileUml inspect ])
+			 label: 'Inspect';
+			 icon: (self iconNamed: #inspect);
+			 action: [ self compileUml inspect ])
 ]
 
 { #category : 'initialization' }

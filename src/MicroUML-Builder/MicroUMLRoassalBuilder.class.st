@@ -9,7 +9,9 @@ Class {
 		'classDiagramNode',
 		'nodes',
 		'colorBlock',
-		'interaction'
+		'interaction',
+		'horizontalMargin',
+		'verticalMargin'
 	],
 	#category : 'MicroUML-Builder',
 	#package : 'MicroUML-Builder'
@@ -178,16 +180,34 @@ MicroUMLRoassalBuilder >> colorFor: aMicroUMLAstNode [
 		  ifNil: [ self defaultColor ]
 ]
 
-{ #category : 'accessing' }
+{ #category : 'defaults' }
 MicroUMLRoassalBuilder >> defaultColor [
 
 	^ Color black
 ]
 
+{ #category : 'defaults' }
+MicroUMLRoassalBuilder >> defaultHorizontalMargin [
+
+	^ 70.0
+]
+
+{ #category : 'defaults' }
+MicroUMLRoassalBuilder >> defaultVerticalMargin [
+
+	^ 50.0
+]
+
 { #category : 'accessing' }
 MicroUMLRoassalBuilder >> horizontalMargin [
 
-	^ 70.0
+	^ horizontalMargin
+]
+
+{ #category : 'accessing' }
+MicroUMLRoassalBuilder >> horizontalMargin: aNumber [
+
+	horizontalMargin := aNumber
 ]
 
 { #category : 'accessing' }
@@ -201,7 +221,9 @@ MicroUMLRoassalBuilder >> initialize [
 
 	super initialize.
 	nodes := Dictionary new.
-	interaction := MicroUMLRoassalInteraction new
+	interaction := MicroUMLRoassalInteraction new.
+	horizontalMargin := self defaultHorizontalMargin.
+	verticalMargin := self defaultVerticalMargin
 ]
 
 { #category : 'instance creation' }
@@ -727,7 +749,13 @@ MicroUMLRoassalBuilder >> renderLollipopsOfClass: aMicroUMLClassNode in: aRSCanv
 { #category : 'accessing' }
 MicroUMLRoassalBuilder >> verticalMargin [
 
-	^ 50.0
+	^ verticalMargin
+]
+
+{ #category : 'accessing' }
+MicroUMLRoassalBuilder >> verticalMargin: aNumber [
+
+	verticalMargin := aNumber
 ]
 
 { #category : 'private' }
