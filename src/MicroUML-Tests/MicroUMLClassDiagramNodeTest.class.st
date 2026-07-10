@@ -46,5 +46,7 @@ MicroUMLClassDiagramNodeTest >> testPrintMicroUMLWithAssociationsUnderClassesOn 
   <>-- #Baz
   *-- #Quuux
 ===
-#Baz *-- #Quuux'
+#Baz *-- #Quuux
+===
+#Quuux'
 ]

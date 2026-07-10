@@ -226,7 +226,6 @@ MicroUMLRoassalBuilder >> newEdgeFor: aMicroUMLAssociationNode [
 			          (self newMarkerFor: aMicroUMLAssociationNode rightHead);
 		          yourself.
 	aMicroUMLAssociationNode line = #dashed ifTrue: [ bazier dashed ].
-	self attachInteraction: bazier.
 	^ bazier
 ]
 

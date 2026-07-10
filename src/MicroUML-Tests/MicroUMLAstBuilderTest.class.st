@@ -15,6 +15,30 @@ MicroUMLAstBuilderTest >> setUp [
 ]
 
 { #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddClassAction [
+
+	builder === #Foo.
+	self assert: builder currentClass name equals: #Foo.
+	self assert: builder currentClass currentMember isNil.
+	self
+		assert: (builder addClassAction: [ #Foo browse ])
+		identicalTo: builder.
+	self assert: builder currentClass actionBlock notNil
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddClassComment [
+
+	builder === #Foo.
+	self assert: builder currentClass name equals: #Foo.
+	self assert: builder currentClass currentMember isNil.
+	self
+		assert: (builder addClassComment: 'quuuux')
+		identicalTo: builder.
+	self assert: builder currentClass comment equals: 'quuuux'
+]
+
+{ #category : 'tests' }
 MicroUMLAstBuilderTest >> testAddClassModifier [
 
 	builder === #Foo.
@@ -31,6 +55,30 @@ MicroUMLAstBuilderTest >> testAddClassName [
 
 	builder === #Foo.
 	self assert: builder currentClass name equals: #Foo
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddMemberAction [
+
+	builder === #Foo - #bar.
+	self assert: builder currentClass name equals: #Foo.
+	self assert: builder currentClass currentMember notNil.
+	self
+		assert: (builder addMemberAction: [ #Foo browse ])
+		identicalTo: builder.
+	self assert: builder currentClass currentMember actionBlock notNil
+]
+
+{ #category : 'tests' }
+MicroUMLAstBuilderTest >> testAddMemberComment [
+
+	builder === #Foo - #bar.
+	self assert: builder currentClass name equals: #Foo.
+	self assert: builder currentClass currentMember notNil.
+	self assert: (builder addMemberComment: 'quuux') identicalTo: builder.
+	self
+		assert: builder currentClass currentMember comment
+		equals: 'quuux'
 ]
 
 { #category : 'tests' }

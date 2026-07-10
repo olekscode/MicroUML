@@ -290,6 +290,12 @@ MicroUMLAssociationNode >> isDirected [
 ]
 
 { #category : 'testing' }
+MicroUMLAssociationNode >> isMicroUMLAssociationNode [
+
+	^ true
+]
+
+{ #category : 'testing' }
 MicroUMLAssociationNode >> isNoAggregation [
 
 	^ leftHead isNil
@@ -445,7 +451,9 @@ MicroUMLAssociationNode >> printMicroUMLOn: aStream [
 
 	leftClass storeOn: aStream.
 	aStream space.
-	self printMicroUMLInLeftClassOn: aStream
+	self
+		printMicroUMLInLeftClassOn: aStream;
+		printActionBlockAndCommentOn: aStream
 ]
 
 { #category : 'testing' }
