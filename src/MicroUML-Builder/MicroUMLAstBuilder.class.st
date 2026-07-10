@@ -467,6 +467,12 @@ MicroUMLAstBuilder >> associationsDo: aBlock [
 	associations do: aBlock
 ]
 
+{ #category : 'rendering' }
+MicroUMLAstBuilder >> canvas [
+
+	^ self newRoassalBuilder build
+]
+
 { #category : 'accessing' }
 MicroUMLAstBuilder >> classAt: aSymbol [
 
@@ -525,12 +531,13 @@ MicroUMLAstBuilder >> ensureClassAt: aSymbol [
 MicroUMLAstBuilder >> extent: aPoint [
 
 	| canvas |
-	canvas := self newRoassalBuilder build.
-	canvas extent: (aPoint isPoint
-			 ifTrue: [ aPoint ]
-			 ifFalse: [ canvas encompassingRectangle extent ]).
-	canvas zoomToFit.
-	^ canvas asForm
+	canvas := self canvas.
+	^ canvas
+		  extent: (aPoint isPoint
+				   ifTrue: [ aPoint ]
+				   ifFalse: [ canvas encompassingRectangle extent ]);
+		  zoomToFit;
+		  asForm
 ]
 
 { #category : 'private' }
