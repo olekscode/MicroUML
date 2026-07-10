@@ -27,33 +27,36 @@ These collaborators work together to ensure that the textual specifications are 
 
 ### Example 1: Creating a Simple Class Diagram
 
-```smalltalk
-builder := MicroUMLAstBuilder new.
-builder === #Person.
-builder - #name @ #String.
-builder - #age @ #Integer.
-builder > #introduce ~ {}.
-builder === #Student.
-builder --|> #Person.
-builder - #studentId @ #String.
-builder > #study ~ {}.
-builder --> #Course.
-builder extent: 600 @ 400.
+```pharoeval
+(MicroUMLAstBuilder
+===
+#Person
+    - #name @ #String
+    - #age @ #Integer
+    > #introduce ~ {}
+=== 
+#Student --|> #Person
+    - #studentId @ #String
+    > #study ~ {}
+    --> #Course
+extent: 600 @ 400) 
+inspect
 ```
-
 This example demonstrates how to create a simple UML diagram with two classes, `Person` and `Student`, where `Student` inherits from `Person` and has a dependency on `Course`.
 
 ### Example 2: Creating a Diagram with Associations
 
-```smalltalk
-builder := MicroUMLAstBuilder new.
-builder === #Department.
-builder - #name @ #String.
-builder === #Employee.
-builder - #name @ #String.
-builder - #department @ #Department.
-builder <>-- #Department @ ('employs' -> 'employed by') %< '1..*' %> '1'.
-builder extent: 600 @ 400.
+```pharoeval
+(MicroUMLAstBuilder
+=== 
+#Department
+    - #name @ #String
+=== #Employee
+    - #name @ #String
+    - #department @ #Department
+    <>-- #Department @ ('employs' -> 'employed by') %< '1..*' %> '1'
+extent: 600 @ 400) 
+inspect
 ```
 
 In this example, an aggregation relationship is established between `Employee` and `Department`, indicating that a department employs multiple employees, and each employee is employed by one department.
