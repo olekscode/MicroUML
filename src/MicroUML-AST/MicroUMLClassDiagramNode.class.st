@@ -225,7 +225,8 @@ MicroUMLClassDiagramNode >> printMicroUMLWithAssociationsUnderClassesOn: aStream
 										aStream
 											cr;
 											nextPutAll: '  '.
-										associationNode printMicroUMLInLeftClassOn: aStream ] ] ] ]
+										associationNode printMicroUMLInLeftClassOn: aStream ] ] ] ].
+
 ]
 
 { #category : 'adding' }

@@ -146,5 +146,7 @@ MicroUMLAssociationNodeTest >> testPrintMicroUMLOn [
 		testPrintMicroUML:
 			'MicroUMLAstBuilder === #Foo <>-- #Bar @ (''left'' -> ''right'') @ ''baz'' %< ''1'' %> ''*'' @= #Quuux';
 		testPrintMicroUML:
-			'MicroUMLAstBuilder === #Foo *=> #Bar @ (''left'' -> ''right'') @ ''baz'' %< ''1'' %> ''*'' @= #Quuux'
+			'MicroUMLAstBuilder === #Foo *=> #Bar @ (''left'' -> ''right'') @ ''baz'' %< ''1'' %> ''*'' @= #Quuux';
+		testPrintMicroUML:
+			'MicroUMLAstBuilder === #Foo *=> #Bar @ (''left'' -> ''right'') @ ''baz'' %< ''1'' %> ''*'' @= #Quuux +[Smalltalk at: #Foo ifPresent: [:class | class browse]] // ''comment'''
 ]

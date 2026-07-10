@@ -1,6 +1,12 @@
 Extension { #name : 'Object' }
 
 { #category : '*MicroUML-AST' }
+Object >> isMicroUMLAssociationNode [
+
+	^ false
+]
+
+{ #category : '*MicroUML-AST' }
 Object >> isMicroUMLAstNode [
 
 	^ false

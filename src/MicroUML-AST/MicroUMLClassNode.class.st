@@ -370,7 +370,7 @@ MicroUMLClassNode >> printMicroUMLOn: aStream [
 			modifiers do: [ :modifier |
 					aStream nextPutAll: ' % '.
 					modifier storeOn: aStream ] ].
-
+	self printActionBlockAndCommentOn: aStream.
 	self superclass ifNotNil: [ :superclassName |
 			(traits isEmpty and: [ members isEmpty ]) ifFalse: [
 					aStream

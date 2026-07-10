@@ -105,6 +105,30 @@ MicroUMLAstNode >> microUML [
 ]
 
 { #category : 'printing' }
+MicroUMLAstNode >> printActionBlockAndCommentOn: aStream [
+
+	self
+		printActionBlockOn: aStream;
+		printCommentOn: aStream
+]
+
+{ #category : 'printing' }
+MicroUMLAstNode >> printActionBlockOn: aStream [
+
+	actionBlock ifNotNil: [
+			aStream nextPutAll: ' +'.
+			actionBlock printOn: aStream ]
+]
+
+{ #category : 'printing' }
+MicroUMLAstNode >> printCommentOn: aStream [
+
+	comment ifNotNil: [
+			aStream nextPutAll: ' // '.
+			comment storeOn: aStream ]
+]
+
+{ #category : 'printing' }
 MicroUMLAstNode >> printMicroUMLOn: aStream [
 
 	^ self subclassResponsibility

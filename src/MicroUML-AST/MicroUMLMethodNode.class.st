@@ -74,7 +74,8 @@ MicroUMLMethodNode >> printMicroUMLOn: aStream [
 	" #argumentTypes  . #type   "
 
 	aStream nextPutAll: (self isMethod
-			 ifTrue: [ '> ' ] ifFalse: [ '- ' ]).
+			 ifTrue: [ '> ' ]
+			 ifFalse: [ '- ' ]).
 	self name storeOn: aStream.
 	self argumentTypes ifNotNil: [ :symbols |
 			aStream nextPutAll: ' ~#('.
@@ -88,7 +89,8 @@ MicroUMLMethodNode >> printMicroUMLOn: aStream [
 	self modifiers ifNotNil: [ :symbols |
 			symbols do: [ :symbol |
 					aStream nextPutAll: ' % '.
-					symbol storeOn: aStream ] ]
+					symbol storeOn: aStream ] ].
+	self printActionBlockAndCommentOn: aStream
 ]
 
 { #category : 'menu operations' }
