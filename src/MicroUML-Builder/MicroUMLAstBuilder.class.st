@@ -543,9 +543,13 @@ MicroUMLAstBuilder >> extent: aPoint [
 { #category : 'private' }
 MicroUMLAstBuilder >> getSymbol: aClassOrString [
 
-	aClassOrString isString ifTrue: [ ^ aClassOrString asSymbol ].
-	aClassOrString isClass ifTrue: [ ^ aClassOrString name asSymbol ].
-	^ self error: 'A string or class expected'
+	aClassOrString isString
+		ifTrue: [ ^ aClassOrString asSymbol ].
+	
+	(aClassOrString isClass or: [ aClassOrString isTrait ])
+		ifTrue: [ ^ aClassOrString name asSymbol ].
+		
+	^ self error: 'A string, class or trait expected'
 ]
 
 { #category : 'initialization' }
