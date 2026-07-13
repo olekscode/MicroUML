@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'builder'
 	],
-	#category : 'MicroUML-Editor',
-	#package : 'MicroUML-Editor'
+	#category : 'MicroUML-Editor-Roassal3',
+	#package : 'MicroUML-Editor',
+	#tag : 'Roassal3'
 }
 
 { #category : 'accessing' }
@@ -58,17 +59,25 @@ MicroUMLCanvasController >> increaseMargin [
 MicroUMLCanvasController >> onShape: aRSCanvas [
 
 	super onShape: aRSCanvas.
-	aRSCanvas when: RSKeyDown send: #processKeyDown: to: self
+	aRSCanvas when: RSKeyStroke send: #processKeystroke: to: self
 ]
 
 { #category : 'events' }
 MicroUMLCanvasController >> processKeyDown: event [
-
-	event shiftKeyPressed ifTrue: [
+	event keyValue = $< codePoint ifTrue: [ ^self decreaseMargin ].
+	event keyValue = $> codePoint ifTrue: [ ^ self increaseMargin ]
+	"event shiftKeyPressed ifTrue: [
 			| keyName |
 			keyName := event keyName.
 			keyName = #PERIOD ifTrue: [ ^ self increaseMargin ].
-			keyName = #COMMA ifTrue: [ ^ self decreaseMargin ] ]
+			keyName = #COMMA ifTrue: [ ^ self decreaseMargin ] ]"
+]
+
+{ #category : 'events' }
+MicroUMLCanvasController >> processKeystroke: event [
+
+	event keyValue = $< codePoint ifTrue: [ ^ self decreaseMargin ].
+	event keyValue = $> codePoint ifTrue: [ ^ self increaseMargin ]
 ]
 
 { #category : 'hooks' }
