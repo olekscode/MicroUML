@@ -4,8 +4,9 @@ Class {
 	#instVars : [
 		'diagram'
 	],
-	#category : 'MicroUML-Editor',
-	#package : 'MicroUML-Editor'
+	#category : 'MicroUML-Editor-Roassal3',
+	#package : 'MicroUML-Editor',
+	#tag : 'Roassal3'
 }
 
 { #category : 'menus' }

@@ -8,8 +8,9 @@ Class {
 		'liveDrawingButton',
 		'builder'
 	],
-	#category : 'MicroUML-Editor',
-	#package : 'MicroUML-Editor'
+	#category : 'MicroUML-Editor-Spec2',
+	#package : 'MicroUML-Editor',
+	#tag : 'Spec2'
 }
 
 { #category : 'examples' }
